@@ -1,6 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
-  import { grievances, stakeholders } from '../lib/stores/store';
+  import { store } from '../lib/stores/store.svelte';
   import KanbanBoard from '../components/KanbanBoard.svelte';
   import GrievanceTable from '../components/GrievanceTable.svelte';
   import ViewToggle from '../components/ViewToggle.svelte';
@@ -18,9 +17,9 @@
 
     // Status Distribution Chart
     const statusData = {
-      pending: $grievances.filter(g => g.status === 'pending').length,
-      in_progress: $grievances.filter(g => g.status === 'in_progress').length,
-      resolved: $grievances.filter(g => g.status === 'resolved').length
+      pending: store.grievances.filter(g => g.status === 'pending').length,
+      in_progress: store.grievances.filter(g => g.status === 'in_progress').length,
+      resolved: store.grievances.filter(g => g.status === 'resolved').length
     };
 
     const statusChart = new Chart(statusChartCanvas, {
@@ -49,29 +48,29 @@
     charts.push(statusChart);
 
     // Monthly Trends Chart
-    const monthlyData = Array(6).fill(0);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const monthlyData = {};
     
-    // Get the last 6 months in chronological order
-    const labels = [];
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      labels.unshift(months[monthIndex]);
-    }
-
-    $grievances.forEach(g => {
-      const date = new Date(g.submitted_at);
-      // Only count grievances from the last 6 months
-      if (date.getTime() > now.getTime() - (6 * 30 * 24 * 60 * 60 * 1000)) {
-        const monthsAgo = (currentMonth - date.getMonth() + 12) % 12;
-        if (monthsAgo < 6 && date.getFullYear() === currentYear) {
-          monthlyData[5 - monthsAgo]++;
-        }
-      }
+    // Process grievances to get date range
+    store.grievances.forEach(g => {
+      const date = new Date(g.created_at);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      monthlyData[key] = (monthlyData[key] || 0) + 1;
     });
+
+    // Sort the keys to get chronological order
+    const sortedKeys = Object.keys(monthlyData).sort();
+    
+    // Take the last 6 months of data (or all if less than 6)
+    const recentKeys = sortedKeys.slice(-6);
+    
+    // Create labels and data arrays
+    const labels = recentKeys.map(key => {
+      const [year, month] = key.split('-');
+      return `${months[parseInt(month)]} ${year}`;
+    });
+    
+    const data = recentKeys.map(key => monthlyData[key]);
 
     const trendsChart = new Chart(trendsChartCanvas, {
       type: 'line',
@@ -79,7 +78,7 @@
         labels,
         datasets: [{
           label: 'Grievances',
-          data: monthlyData,
+          data,
           borderColor: '#64B5F6',
           tension: 0.4,
           fill: true,
@@ -91,10 +90,10 @@
         maintainAspectRatio: false,
         layout: {
           padding: {
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 10
+            left: 5,
+            right: 5,
+            top: 5,
+            bottom: 5
           }
         },
         scales: {
@@ -103,9 +102,9 @@
             ticks: {
               stepSize: 1,
               color: '#e0e0e0',
-              padding: 8,
+              padding: 5,
               font: {
-                size: 11
+                size: 10
               }
             },
             grid: {
@@ -118,23 +117,22 @@
             },
             ticks: {
               color: '#e0e0e0',
-              padding: 8,
-              maxRotation: 0,
+              padding: 5,
+              maxRotation: 45,
               font: {
-                size: 11
+                size: 10
               }
             }
           }
         },
         plugins: {
           legend: {
-            labels: {
-              color: '#e0e0e0',
-              boxWidth: 12,
-              padding: 15,
-              font: {
-                size: 11
-              }
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              title: (context) => context[0].label,
+              label: (context) => `${context.parsed.y} grievance${context.parsed.y !== 1 ? 's' : ''}`
             }
           }
         }
@@ -144,7 +142,7 @@
   }
 
   $effect(() => {
-    if ($grievances && statusChartCanvas && trendsChartCanvas) {
+    if (store.grievances && statusChartCanvas && trendsChartCanvas) {
       createCharts();
     }
   });
@@ -162,23 +160,23 @@
   <div class="stats-grid">
     <div class="stat-card">
       <h3>Total Grievances</h3>
-      <p class="stat-number">{$grievances.length}</p>
+      <p class="stat-number">{store.grievances.length}</p>
     </div>
     <div class="stat-card">
       <h3>Resolved</h3>
       <p class="stat-number">
-        {$grievances.filter(g => g.status === 'resolved').length}
+        {store.grievances.filter(g => g.status === 'resolved').length}
       </p>
     </div>
     <div class="stat-card">
       <h3>Pending</h3>
       <p class="stat-number">
-        {$grievances.filter(g => g.status === 'pending').length}
+        {store.grievances.filter(g => g.status === 'pending').length}
       </p>
     </div>
     <div class="stat-card">
       <h3>Stakeholders</h3>
-      <p class="stat-number">{$stakeholders.length}</p>
+      <p class="stat-number">{store.stakeholders.length}</p>
     </div>
   </div>
 
@@ -204,12 +202,13 @@
     </div>
     <div class="content">
       {#if view === 'kanban'}
-        <KanbanBoard grievances={$grievances} />
+        <KanbanBoard grievances={store.grievances} />
       {:else}
         <GrievanceTable 
-          grievances={$grievances}
+          grievances={store.grievances}
           showColumns={['submitter_name', 'rank', 'unit', 'position', 'grievance_type', 'status', 'created_at']}
           canEditStatus={true}
+          readonly={false}
         />
       {/if}
     </div>
@@ -282,20 +281,19 @@
 
   .chart-card {
     background: var(--gray-dark, #333333);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     width: 100%;
-    height: 400px;
+    height: 300px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
   .chart-card h3 {
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 0.5rem 0;
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-light, #FFFFFF);
@@ -308,9 +306,7 @@
     flex: 1;
     min-height: 0;
     width: 100%;
-    max-width: 100%;
-    height: calc(100% - 2.5rem);
-    overflow: hidden;
+    height: calc(100% - 1.5rem);
   }
 
   canvas {
@@ -344,10 +340,11 @@
   @media (max-width: 1200px) {
     .charts-grid {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
 
     .chart-card {
-      height: 350px;
+      height: 250px;
     }
   }
 

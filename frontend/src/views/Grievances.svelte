@@ -1,9 +1,9 @@
 <script>
-  import { actions } from '../lib/stores/store';
+  import { store } from '../lib/stores/store.svelte';
   import { post } from '../lib/api/client';
   import { auth } from '../lib/stores/authStore.svelte';
 
-  let formEl;
+  let formEl = $state(null);
   let submitting = $state(false);
   let step = $state(1);
 
@@ -88,11 +88,11 @@
         submitter_name: formData.submitter_name
       });
       
-      actions.addGrievance(response);
+      store.addGrievance(response);
       resetForm();
-      actions.setError('Grievance submitted successfully');
+      store.setError('✓ Grievance submitted successfully');
     } catch (error) {
-      actions.setError('Failed to submit grievance: ' + error.message);
+      store.setError('Failed to submit grievance: ' + error.message);
     } finally {
       submitting = false;
     }
@@ -141,20 +141,23 @@ ${formData.description}
     <div class="progress-sidebar">
       <div class="progress-step" 
            class:active={step === 1}
-           onclick={() => step = 1}>
-        <div class="step-circle"></div>
+           onclick={() => step = 1}
+           role="button">
+        <div class="step-circle" role="presentation"></div>
         <span>Personal Information</span>
       </div>
       <div class="progress-step" 
            class:active={step === 2}
-           onclick={() => step = 2}>
-        <div class="step-circle"></div>
+           onclick={() => step = 2}
+           role="button">
+        <div class="step-circle" role="presentation"></div>
         <span>Unit Details</span>
       </div>
       <div class="progress-step" 
            class:active={step === 3}
-           onclick={() => step = 3}>
-        <div class="step-circle"></div>
+           onclick={() => step = 3}
+           role="button">
+        <div class="step-circle" role="presentation"></div>
         <span>Grievance Details</span>
       </div>
     </div>
@@ -515,5 +518,43 @@ ${formData.description}
     background: var(--primary-dark, #1A1A1A);
     border-radius: 8px;
     margin: 1rem;
+  }
+
+  .success {
+    background: #2e3b2e;
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .success button {
+    background: #4CAF50;
+    color: #1a1a1a;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .success button:hover {
+    background: #45a049;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 </style>

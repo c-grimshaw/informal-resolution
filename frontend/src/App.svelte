@@ -1,9 +1,14 @@
 <script>
   import { onMount } from 'svelte';
-  import { loading, error } from './lib/stores/store';
+  import {store } from './lib/stores/store.svelte';
   import { auth } from './lib/stores/authStore.svelte';
-  import { actions } from './lib/stores/store';
   import { get } from './lib/api/client';
+  import { 
+    Home as HomeIcon, 
+    FileText, 
+    Users, 
+    Settings 
+  } from 'lucide-svelte';
   
   // Components
   import Auth from './components/Auth.svelte';
@@ -18,25 +23,25 @@
   
   function handleNavigation(route) {
     currentRoute = route;
-    actions.clearError();
+    store.clearError();
   }
   
   async function loadInitialData() {
     if (!auth.isAuthenticated) return;
     
     try {
-        actions.setLoading(true);
+        store.setLoading(true);
         const [grievancesData, userData] = await Promise.all([
             get('/grievances'),
             get('/users/me')
         ]);
-        actions.setGrievances(grievancesData);
+        store.setGrievances(grievancesData);
         auth.setUser(userData);
     } catch (e) {
-        actions.setError(e.message);
+        store.setError(e.message);
         console.error('Failed to load initial data:', e);
     } finally {
-        actions.setLoading(false);
+        store.setLoading(false);
     }
   }
 
@@ -60,7 +65,8 @@
             class:active={currentRoute === 'home'} 
             onclick={() => handleNavigation('home')}
           >
-            Home
+            <HomeIcon size={16} />
+            <span>Home</span>
           </button>
         </li>
         {#if auth.isAuthenticated}
@@ -69,7 +75,8 @@
               class:active={currentRoute === 'grievances'} 
               onclick={() => handleNavigation('grievances')}
             >
-              Grievances
+              <FileText size={16} />
+              <span>Grievances</span>
             </button>
           </li>
           {#if auth.isSupervisor}
@@ -78,7 +85,8 @@
                 class:active={currentRoute === 'stakeholders'} 
                 onclick={() => handleNavigation('stakeholders')}
               >
-                Stakeholders
+                <Users size={16} />
+                <span>Stakeholders</span>
               </button>
             </li>
             <li>
@@ -86,7 +94,8 @@
                 class:active={currentRoute === 'admin'} 
                 onclick={() => handleNavigation('admin')}
               >
-                Manage
+                <Settings size={16} />
+                <span>Manage</span>
               </button>
             </li>
           {/if}
@@ -98,17 +107,17 @@
     </div>
   </nav>
 
-  {#if $loading}
+  {#if store.loading}
     <div class="loading">
       <div class="spinner"></div>
       <p>Loading...</p>
     </div>
   {/if}
 
-  {#if $error}
+  {#if store.error}
     <div class="error">
-      <p>{$error}</p>
-      <button onclick={actions.clearError}>Dismiss</button>
+      <p>{store.error}</p>
+      <button onclick={store.clearError}>Dismiss</button>
     </div>
   {/if}
 
@@ -343,5 +352,15 @@
     text-align: center;
     padding: 2rem;
     color: #e0e0e0;
+  }
+
+  .nav-links button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-links :global(svg) {
+    color: inherit;
   }
 </style>

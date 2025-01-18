@@ -1,7 +1,7 @@
 <script>
     import { auth } from '../lib/stores/authStore.svelte';
     import { login, register, logout } from '../lib/api/auth';
-    import { error as errorStore } from '../lib/stores/store';
+    import {store} from '../lib/stores/store.svelte';
 
     let email = $state('');
     let password = $state('');
@@ -10,7 +10,7 @@
 
     async function handleSubmit(e) {
         e.preventDefault();
-        loading = true;
+        store.setLoading(true);
         try {
             if (isRegistering) {
                 await register(email, password);
@@ -21,7 +21,7 @@
             email = '';
             password = '';
         } catch (e) {
-            errorStore.set(e.message);
+            store.setError(e.message);
         } finally {
             loading = false;
         }

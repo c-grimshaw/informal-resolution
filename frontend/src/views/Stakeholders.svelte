@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { stakeholders, loading, error } from '../lib/stores/store';
+  import {store} from '../lib/stores/store.svelte';
   import { get, post, put, del } from '../lib/api/client';
 
   let newStakeholder = {
@@ -11,38 +11,38 @@
 
   async function loadStakeholders() {
     try {
-      $loading = true;
+      store.setLoading(true);
       const data = await get('/api/stakeholders');
-      $stakeholders = data;
+      store.setStakeholders(data);
     } catch (e) {
-      $error = e.message;
+      store.setError(e.message);
     } finally {
-      $loading = false;
+      store.setLoading(false);
     }
   }
 
   async function handleSubmit() {
     try {
-      $loading = true;
+      store.setLoading(true);
       const response = await post('/api/stakeholders', newStakeholder);
-      $stakeholders = [...$stakeholders, response];
+      store.setStakeholders([...store.stakeholders, response]);
       newStakeholder = { name: '', email: '', role: 'user' };
     } catch (e) {
-      $error = e.message;
+      store.setError(e.message);
     } finally {
-      $loading = false;
+      store.setLoading(false);
     }
   }
 
   async function handleRoleChange(stakeholder) {
     try {
-      $loading = true;
+      store.setLoading(true);
       const response = await put(`/api/stakeholders/${stakeholder.id}`, stakeholder);
-      $stakeholders = $stakeholders.map(s => s.id === stakeholder.id ? response : s);
+      store.setStakeholders(store.stakeholders.map(s => s.id === stakeholder.id ? response : s));
     } catch (e) {
-      $error = e.message;
+      store.setError(e.message);
     } finally {
-      $loading = false;
+      store.setLoading(false);
     }
   }
 
@@ -50,13 +50,13 @@
     if (!confirm('Are you sure you want to delete this stakeholder?')) return;
     
     try {
-      $loading = true;
+      store.setLoading(true);
       await del(`/api/stakeholders/${id}`);
-      $stakeholders = $stakeholders.filter(s => s.id !== id);
+      store.setStakeholders(store.stakeholders.filter(s => s.id !== id));
     } catch (e) {
-      $error = e.message;
+      store.setError(e.message);
     } finally {
-      $loading = false;
+      store.setLoading(false);
     }
   }
 
@@ -88,7 +88,7 @@
   </form>
 
   <div class="stakeholders-list">
-    {#each $stakeholders as stakeholder}
+    {#each store.stakeholders as stakeholder}
       <div class="stakeholder-card">
         <div class="stakeholder-info">
           <h3>{stakeholder.name}</h3>

@@ -1,5 +1,5 @@
 <script>
-  import { stakeholders } from '../lib/stores/store';
+  import { store } from '../lib/stores/store.svelte';
   import { auth } from '../lib/stores/authStore.svelte';
   import { get } from '../lib/api/client';
   import GrievanceTable from '../components/GrievanceTable.svelte';
@@ -20,6 +20,10 @@
       loadUserGrievances();
     }
   });
+
+  function handleGrievanceDelete(grievanceId) {
+    userGrievances = userGrievances.filter(g => g.id !== grievanceId);
+  }
 </script>
 
 <div class="home">
@@ -34,7 +38,7 @@
     {#if auth.isSupervisor}
       <div class="stat-card">
         <h3>Total Stakeholders</h3>
-        <p class="stat-number">{$stakeholders.length}</p>
+        <p class="stat-number">{store.stakeholders.length}</p>
       </div>
     {/if}
   </div>
@@ -45,6 +49,10 @@
       grievances={userGrievances}
       showColumns={['grievance_type', 'status', 'created_at']}
       canEditStatus={false}
+      readonly={true}
+      canDelete={true}
+      onDelete={handleGrievanceDelete}
+      showFilters={false}
     />
   </div>
 </div>

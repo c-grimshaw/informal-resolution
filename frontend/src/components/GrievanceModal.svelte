@@ -145,6 +145,7 @@
     position: relative;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
     animation: slideIn 0.2s ease-out;
+    text-align: left;
   }
 
   @keyframes fadeIn {
@@ -194,6 +195,7 @@
   .modal-header {
     padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--gray-medium, #666666);
+    text-align: left;
   }
 
   .modal-header h2 {
@@ -212,6 +214,7 @@
 
   .modal-body {
     padding: 2rem;
+    text-align: left;
   }
 
   .info-section {
@@ -263,6 +266,15 @@
     line-height: 1.6;
     color: var(--text-light, #FFFFFF);
     opacity: 0.9;
+  }
+
+  .field-label {
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+
+  .field-value {
+    text-align: left;
   }
 
   @media (max-width: 640px) {

@@ -1,6 +1,6 @@
 <script>
-  import { actions, loading } from '../lib/stores/store';
-  import { put } from '../lib/api/client';
+  import { store } from '../lib/stores/store.svelte';
+  import { put, del } from '../lib/api/client';
   import { 
     ArrowUp,
     ArrowDown,
@@ -12,7 +12,8 @@
     CheckCircle2,
     Timer,
     Medal,
-    Target
+    Target,
+    X
   } from 'lucide-svelte';
   import TypeBadges from './TypeBadges.svelte';
   import GrievanceModal from './GrievanceModal.svelte';
@@ -20,7 +21,11 @@
   const { 
     grievances,
     showColumns = ['rank', 'unit', 'position', 'grievance_type', 'status', 'created_at'],
-    canEditStatus = false 
+    showFilters = true,
+    canEditStatus = false,
+    readonly = false,
+    canDelete = false,
+    onDelete = null
   } = $props();
 
   // Define all possible columns
@@ -67,14 +72,14 @@
                (!filters.status || g.status === filters.status);
       })
       .sort((a, b) => {
-        const aVal = a[sortField];
-        const bVal = b[sortField];
         const direction = sortDirection === 'asc' ? 1 : -1;
-
+        
         if (sortField === 'created_at') {
-          return direction * (new Date(aVal).getTime() - new Date(bVal).getTime());
+          return direction * (new Date(a[sortField]).getTime() - new Date(b[sortField]).getTime());
         }
         
+        const aVal = a[sortField].toLowerCase();
+        const bVal = b[sortField].toLowerCase();
         return direction * (aVal < bVal ? -1 : aVal > bVal ? 1 : 0);
       })
   );
@@ -90,7 +95,7 @@
 
   async function handleStatusChange(grievance, newStatus) {
     try {
-      $loading = true;
+      store.setLoading(true);
       const updatedGrievance = {
         name: grievance.name,
         serviceNumber: grievance.serviceNumber,
@@ -106,11 +111,11 @@
       };
       
       const response = await put(`/grievances/${grievance.id}`, updatedGrievance);
-      actions.updateGrievance(grievance.id, response);
+      store.updateGrievance(grievance.id, response);
     } catch (error) {
-      actions.setError('Failed to update status');
+      store.setError('Failed to update status');
     } finally {
-      $loading = false;
+      store.setLoading(false);
     }
   }
 
@@ -155,9 +160,40 @@
     showModal = false;
     selectedGrievance = null;
   }
+
+  function getStatusClass(status) {
+    switch(status) {
+      case 'pending':
+        return 'status-pending';
+      case 'in_progress':
+        return 'status-in-progress';
+      case 'resolved':
+        return 'status-resolved';
+      default:
+        return '';
+    }
+  }
+
+  async function handleDelete(grievance, event) {
+    event.stopPropagation(); // Prevent row click
+    
+    if (!confirm('Are you sure you want to delete this grievance? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await del(`/grievances/${grievance.id}`);
+      if (onDelete) {
+        onDelete(grievance.id);
+      }
+    } catch (error) {
+      store.setError('Failed to delete grievance');
+    }
+  }
 </script>
 
 <div class="table-container" class:modal-open={showModal}>
+  {#if showFilters}
   <div class="filters">
     <div class="filter-group">
       <User size={16} />
@@ -196,6 +232,7 @@
       {/each}
     </select>
   </div>
+  {/if}
 
   <div class="table-scroll">
     <table>
@@ -205,19 +242,20 @@
             <th onclick={() => toggleSort(column.field)}>
               <div class="th-content">
                 {#if column.icon}
-                  <svelte:component this={column.icon} size={16} />
+                    {@const Icon = column.icon}
+                    <Icon size={16} />
                 {/if}
                 <span>{column.label}</span>
                 {#if sortField === column.field}
-                  <svelte:component 
-                    this={sortDirection === 'asc' ? ArrowUp : ArrowDown} 
-                    size={16} 
-                    class="sort-indicator" 
-                  />
+                  {@const SortIcon = sortDirection === 'asc' ? ArrowUp : ArrowDown}
+                  <SortIcon size={16} class="sort-indicator" />
                 {/if}
               </div>
             </th>
           {/each}
+          {#if canDelete}
+            <th></th>
+          {/if}
         </tr>
       </thead>
       <tbody>
@@ -233,8 +271,11 @@
                   />
                 {:else if column.field === 'status'}
                   <div class="status-container">
-                    <svelte:component this={getStatusIcon(grievance.status)} size={16} class="status-icon {grievance.status}" />
-                    {#if canEditStatus}
+                    {#if grievance.status}
+                    {@const StatusIcon = getStatusIcon(grievance.status)}
+                    <StatusIcon size={16} class="status-icon {grievance.status}" />
+                    {/if}
+                    {#if canEditStatus && !readonly}
                       <select 
                         value={grievance.status}
                         onchange={(e) => handleStatusChange(grievance, e.currentTarget.value)}
@@ -248,7 +289,9 @@
                         {/each}
                       </select>
                     {:else}
-                      <span class="status-text">{grievance.status.replace('_', ' ')}</span>
+                      <span class="status-badge {getStatusClass(grievance.status)}">
+                        {grievance.status.replace('_', ' ')}
+                      </span>
                     {/if}
                   </div>
                 {:else if column.field === 'created_at'}
@@ -258,6 +301,17 @@
                 {/if}
               </td>
             {/each}
+            {#if canDelete}
+              <td class="delete-cell">
+                <button 
+                  class="delete-btn"
+                  onclick={(e) => handleDelete(grievance, e)}
+                  title="Delete grievance"
+                >
+                  <X size={16} />
+                </button>
+              </td>
+            {/if}
           </tr>
         {/each}
       </tbody>
@@ -357,6 +411,7 @@
 
   tr:hover {
     background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
   }
 
   .description-cell {
@@ -476,15 +531,43 @@
     gap: 0.5rem;
   }
 
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-transform: capitalize;
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .status-pending {
+    background: rgba(255, 165, 0, 0.2);
+    color: #FFA500;
+    border: 1px solid #FFA500;
+  }
+
+  .status-in-progress {
+    background: rgba(100, 181, 246, 0.2);
+    color: #64B5F6;
+    border: 1px solid #64B5F6;
+  }
+
+  .status-resolved {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+  }
+
   .status-icon {
-    min-width: 16px;
+    opacity: 0.8;
   }
 
   .status-icon.pending {
     color: #FFA500;
   }
 
-  .status-icon.in-progress {
+  .status-icon.in_progress {
     color: #64B5F6;
   }
 
@@ -499,5 +582,28 @@
 
   .table-container.modal-open .table-scroll {
     overflow: hidden;
+  }
+
+  .delete-cell {
+    width: 40px;
+    text-align: center;
+  }
+
+  .delete-btn {
+    background: transparent;
+    border: none;
+    color: #ff5252;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-btn:hover {
+    background: rgba(255, 82, 82, 0.1);
+    color: #ff7070;
   }
 </style> 

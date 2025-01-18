@@ -1,5 +1,5 @@
 <script>
-  import { actions } from '../lib/stores/store';
+  import { store } from '../lib/stores/store.svelte';
   import { put } from '../lib/api/client';
   import KanbanColumn from './KanbanColumn.svelte';
 
@@ -38,7 +38,7 @@
       console.log('Updating grievance with data:', JSON.stringify(updatedGrievance, null, 2));
       
       // Set loading state
-      actions.setLoading(true);
+      store.setLoading(true);
       
       try {
         const response = await put(`/grievances/${grievanceId}`, updatedGrievance);
@@ -47,7 +47,7 @@
         // Only update the store if we got a valid response
         if (response && response.id) {
           // Update the store with the response data
-          actions.updateGrievance(grievanceId, response);
+          store.updateGrievance(grievanceId, response);
         } else {
           throw new Error('Invalid response from server');
         }
@@ -58,12 +58,12 @@
         console.error('API Error Status:', apiError.response?.status);
         throw apiError;
       } finally {
-        actions.setLoading(false);
+        store.setLoading(false);
       }
     } catch (error) {
       console.error('Failed to update grievance status:', error);
       console.error('Error details:', error.response?.data || error.message);
-      actions.setError('Failed to update status');
+      store.setError('Failed to update status');
     }
   }
 </script>
