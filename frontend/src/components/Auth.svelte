@@ -79,21 +79,26 @@
         display: flex;
         gap: 0.5rem;
         align-items: center;
+        max-width: 100%;
     }
 
     .form-group {
         margin: 0;
+        width: 100%;
     }
 
     .form-group input {
         width: 150px;
         padding: 0.25rem 0.5rem;
         font-size: 0.9rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
     }
 
     .form-actions {
         display: flex;
         gap: 0.5rem;
+        flex-wrap: wrap;
     }
 
     .auth-status {
@@ -101,32 +106,59 @@
         align-items: center;
         gap: 1rem;
         color: #e0e0e0;
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    .auth-status span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
     }
 
     .logout-btn {
         background: #ff5252;
         color: white;
+        white-space: nowrap;
     }
 
     .switch-btn {
         background: transparent;
         border: 1px solid #64b5f6;
         color: #64b5f6;
+        white-space: nowrap;
     }
 
     button {
         padding: 0.25rem 0.5rem;
         font-size: 0.9rem;
+        border-radius: 4px;
+        min-width: 80px;
     }
 
+    /* Tablet breakpoint */
+    @media (max-width: 1024px) {
+        .form-group input {
+            width: 130px;
+        }
+    }
+
+    /* Mobile breakpoint */
     @media (max-width: 768px) {
         .auth-form {
             flex-direction: column;
+            width: 100%;
+            gap: 0.75rem;
+        }
+
+        .form-group {
             width: 100%;
         }
 
         .form-group input {
             width: 100%;
+            padding: 0.5rem;
         }
 
         .form-actions {
@@ -136,6 +168,31 @@
 
         button {
             flex: 1;
+            padding: 0.5rem;
+        }
+
+        .auth-status {
+            width: 100%;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+    }
+
+    /* Small mobile breakpoint */
+    @media (max-width: 480px) {
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .auth-status {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
         }
     }
 </style> 

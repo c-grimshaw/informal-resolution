@@ -183,6 +183,7 @@
 
     try {
       await del(`/grievances/${grievance.id}`);
+      store.deleteGrievance(grievance.id);
       if (onDelete) {
         onDelete(grievance.id);
       }

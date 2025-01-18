@@ -11,9 +11,9 @@ async function handleResponse(response) {
 }
 
 export async function get(endpoint) {
-    const headers = {};
+    const headers = new Headers();
     if (auth.token) {
-        headers['Authorization'] = `Bearer ${auth.token}`;
+        headers.append('Authorization', `Bearer ${auth.token}`);
     }
     
     const response = await fetch(`${BASE_URL}${endpoint}`, { headers });
@@ -21,11 +21,11 @@ export async function get(endpoint) {
 }
 
 export async function post(endpoint, data) {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
+    const headers = new Headers({
+        'Content-Type': 'application/json'
+    });
     if (auth.token) {
-        headers['Authorization'] = `Bearer ${auth.token}`;
+        headers.append('Authorization', `Bearer ${auth.token}`);
     }
     
     const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -37,11 +37,11 @@ export async function post(endpoint, data) {
 }
 
 export async function put(endpoint, data) {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
+    const headers = new Headers({
+        'Content-Type': 'application/json'
+    });
     if (auth.token) {
-        headers['Authorization'] = `Bearer ${auth.token}`;
+        headers.append('Authorization', `Bearer ${auth.token}`);
     }
     
     const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -53,9 +53,9 @@ export async function put(endpoint, data) {
 }
 
 export async function del(endpoint) {
-    const headers = {};
+    const headers = new Headers();
     if (auth.token) {
-        headers['Authorization'] = `Bearer ${auth.token}`;
+        headers.append('Authorization', `Bearer ${auth.token}`);
     }
     
     const response = await fetch(`${BASE_URL}${endpoint}`, {
