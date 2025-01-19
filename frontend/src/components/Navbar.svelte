@@ -40,7 +40,7 @@
                         <span>Grievances</span>
                     </button>
                 </li>
-                {#if auth.isSupervisor}
+                {#if auth.isAdmin}
                     <li>
                         <button 
                             class:active={currentRoute === 'stakeholders'} 

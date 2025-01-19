@@ -13,7 +13,7 @@
   import { patch } from '../lib/api/client';
   import { ranks, units } from '../lib/constants';
 
-  let { isOpen = false, closeModal = $bindable() } = $props();
+  let { isOpen = false, closeModal = $bindable(), onProfileUpdate = $bindable() } = $props();
   
   let submitting = $state(false);
   let formData = $state({
@@ -52,6 +52,7 @@
       const response = await patch(`/users/me`, updateData);
       auth.setUser(response);
       store.setError('✓ Profile updated successfully');
+      if (onProfileUpdate) onProfileUpdate();
       closeModal();
     } catch (error) {
       store.setError('Failed to update profile: ' + error.message);

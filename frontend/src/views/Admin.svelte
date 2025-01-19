@@ -1,5 +1,6 @@
 <script>
   import { store } from '../lib/stores/store.svelte';
+  import { get } from '../lib/api/client';
   import KanbanBoard from '../components/KanbanBoard.svelte';
   import GrievanceTable from '../components/GrievanceTable.svelte';
   import ViewToggle from '../components/ViewToggle.svelte';
@@ -7,9 +8,23 @@
   import TrendsChart from '../components/TrendsChart.svelte';
   import { ChevronDown } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
+  import { onMount } from 'svelte';
 
   let view = $state('table');
   let isChartsVisible = $state(false);
+
+  async function loadGrievances() {
+    try {
+      const data = await get('/grievances');
+      store.setGrievances(data);
+    } catch (error) {
+      store.setError('Failed to load grievances: ' + error.message);
+    }
+  }
+
+  onMount(() => {
+    loadGrievances();
+  });
 
   function handleViewToggle(event) {
     view = event.detail;

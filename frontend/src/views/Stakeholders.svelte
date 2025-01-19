@@ -7,8 +7,14 @@
 
   let stakeholders = $state([]);
 
-  onMount(async () => {
-    await fetchStakeholders();
+  onMount(() => {
+    fetchStakeholders();
+    // Listen for profile updates
+    window.addEventListener('profileUpdate', fetchStakeholders);
+    // Return cleanup function
+    return () => {
+      window.removeEventListener('profileUpdate', fetchStakeholders);
+    };
   });
 
   async function fetchStakeholders() {

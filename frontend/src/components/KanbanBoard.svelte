@@ -42,16 +42,18 @@
       }
       
       const updatedGrievance = {
-        name: grievance.name,
-        serviceNumber: grievance.serviceNumber,
+        title: grievance.title,
+        description: grievance.description,
+        redress_sought: grievance.redress_sought,
+        submitter_name: grievance.submitter_name,
+        service_number: grievance.service_number,
         rank: grievance.rank,
         email: grievance.email,
         phone: grievance.phone,
         unit: grievance.unit,
         position: grievance.position,
-        grievanceType: grievance.grievanceType,
-        grievanceSubType: grievance.grievanceSubType,
-        description: grievance.description,
+        grievance_type: grievance.grievance_type,
+        grievance_subtype: grievance.grievance_subtype,
         status: newStatus
       };
       

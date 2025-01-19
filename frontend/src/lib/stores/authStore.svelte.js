@@ -18,9 +18,10 @@ function setToken(newToken) {
 function setUser(userData) {
     user = userData;
     if (userData) {
-        isAdmin = userData.is_superuser || false;
-        // In FastAPI Users, superuser has all privileges
-        isSupervisor = userData.is_superuser || userData.is_supervisor || false;
+        // Check both superuser status and role for admin privileges
+        isAdmin = userData.is_superuser || userData.role === 'admin' || false;
+        // Check superuser, admin role, or supervisor role for supervisor privileges
+        isSupervisor = userData.is_superuser || userData.role === 'admin' || userData.role === 'supervisor' || false;
     } else {
         isAdmin = false;
         isSupervisor = false;

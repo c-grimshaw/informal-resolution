@@ -7,29 +7,67 @@
     Medal,
     Briefcase,
     X,
-    Hash
+    Hash,
+    ChevronDown,
+    ChevronUp
   } from 'lucide-svelte';
   import TypeBadges from './TypeBadges.svelte';
+  import { auth } from '../lib/stores/authStore.svelte';
+  import { store } from '../lib/stores/store.svelte';
+  import { get, patch, post } from '../lib/api/client';
+  import { grievanceStatuses } from '../lib/constants';
   
-  let { grievance, isOpen = false, closeModal = $bindable() } = $props();
+  let { grievance = null, isOpen = false, closeModal = $bindable() } = $props();
+  let submitting = $state(false);
+  let notes = $state([]);
+  let newNote = $state('');
+  let isNotesExpanded = $state(true);
 
-  function formatDate(dateString) {
-    if (!dateString) return 'N/A';
+  async function loadNotes() {
+    if (!grievance) return;
     try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'Invalid Date';
-      return new Intl.DateTimeFormat('en-CA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }).format(date);
+      const response = await get(`/grievances/${grievance.id}/notes`);
+      notes = response;
     } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Invalid Date';
+      store.setError('Failed to load notes: ' + error.message);
     }
   }
+
+  async function addNote() {
+    if (!newNote.trim()) return;
+    
+    try {
+      submitting = true;
+      const response = await post(`/grievances/${grievance.id}/notes`, {
+        content: newNote.trim()
+      });
+      notes = [response, ...notes];
+      newNote = '';
+      isNotesExpanded = true;
+    } catch (error) {
+      store.setError('Failed to add note: ' + error.message);
+    } finally {
+      submitting = false;
+    }
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+
+  $effect(() => {
+    if (grievance?.id) {
+      loadNotes();
+    }
+  });
 
   function handleBackdropClick(event) {
     if (event.target === event.currentTarget) {
@@ -122,6 +160,49 @@
             <h4>Redress Requested</h4>
             <p>{grievance.redress_sought || 'No redress specified'}</p>
           </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="notes-section">
+          <div class="section-header" onclick={() => isNotesExpanded = !isNotesExpanded}>
+            <h3>Notes</h3>
+            {#if isNotesExpanded}
+              <ChevronUp size={20} />
+            {:else}
+              <ChevronDown size={20} />
+            {/if}
+          </div>
+          
+          {#if isNotesExpanded}
+            <div class="notes-content">
+              <form onsubmit={e => { e.preventDefault(); addNote(); }} class="note-form">
+                <textarea
+                  bind:value={newNote}
+                  placeholder="Add a note..."
+                  rows="3"
+                  disabled={submitting}
+                ></textarea>
+                <button type="submit" disabled={submitting || !newNote.trim()}>
+                  Add Note
+                </button>
+              </form>
+
+              <div class="notes-list">
+                {#each notes as note (note.id)}
+                  <div class="note">
+                    <div class="note-header">
+                      <span class="note-author">{note.user_name}</span>
+                      <span class="note-date">{formatDate(note.created_at)}</span>
+                    </div>
+                    <div class="note-content">
+                      {note.content}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -351,6 +432,106 @@
     opacity: 0.7;
     text-align: center;
     padding: 1rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--gray-medium, #666666);
+    margin: 1.5rem 0;
+  }
+
+  .notes-section {
+    margin-top: 1rem;
+    border: 1px solid var(--gray-medium, #666666);
+    border-radius: 4px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--primary-dark, #1A1A1A);
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .section-header:hover {
+    background: var(--gray-dark, #333333);
+  }
+
+  .section-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .notes-content {
+    padding: 1rem;
+  }
+
+  .note-form {
+    margin-bottom: 1rem;
+  }
+
+  .note-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-medium, #666666);
+    border-radius: 4px;
+    background: var(--gray-dark, #333333);
+    color: var(--text-light, #FFFFFF);
+    resize: vertical;
+    margin-bottom: 0.5rem;
+  }
+
+  .note-form button {
+    padding: 0.5rem 1rem;
+    background: var(--primary-red, #C41E3A);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .note-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .note {
+    background: var(--gray-dark, #333333);
+    border: 1px solid var(--gray-medium, #666666);
+    border-radius: 4px;
+    padding: 1rem;
+  }
+
+  .note-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .note-author {
+    font-weight: 500;
+    color: var(--primary-red, #C41E3A);
+  }
+
+  .note-date {
+    color: var(--gray-light, #999999);
+  }
+
+  .note-content {
+    white-space: pre-wrap;
+    color: var(--text-light, #FFFFFF);
   }
 
   @media (max-width: 640px) {

@@ -85,6 +85,11 @@
 <UserProfileModal
     isOpen={showProfileModal}
     closeModal={() => showProfileModal = false}
+    onProfileUpdate={async () => {
+        // Dispatch a custom event that can be listened to by parent components
+        const event = new CustomEvent('profileUpdate');
+        window.dispatchEvent(event);
+    }}
 />
 
 <style>

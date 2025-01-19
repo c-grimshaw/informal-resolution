@@ -1,6 +1,7 @@
 <script>
   import { store } from '../lib/stores/store.svelte';
-  import { del } from '../lib/api/client';
+  import { auth } from '../lib/stores/authStore.svelte';
+  import { del, patch } from '../lib/api/client';
   import { 
     ArrowUp,
     ArrowDown,
@@ -19,6 +20,12 @@
     canDelete = false,
     onDelete = null
   } = $props();
+
+  const roleOptions = [
+    { value: 'user', label: 'User' },
+    { value: 'supervisor', label: 'Supervisor' },
+    { value: 'admin', label: 'Admin' }
+  ];
 
   // Define all possible columns
   const columns = [
@@ -78,6 +85,28 @@
       }
     } catch (error) {
       store.setError('Failed to delete user');
+    }
+  }
+
+  async function handleRoleChange(stakeholder, newRole) {
+    try {
+      store.setLoading(true);
+      const response = await patch(`/users/${stakeholder.id}`, {
+        role: newRole
+      });
+      // Update the stakeholder in the local state
+      stakeholders = stakeholders.map(s => 
+        s.id === stakeholder.id ? { ...s, role: newRole } : s
+      );
+      // If this is the current user, update the auth store
+      if (stakeholder.id === auth.user?.id) {
+        auth.setUser({ ...auth.user, role: newRole });
+      }
+      store.setError('✓ Role updated successfully');
+    } catch (error) {
+      store.setError('Failed to update role: ' + error.message);
+    } finally {
+      store.setLoading(false);
     }
   }
 
@@ -165,9 +194,21 @@
             {#each columns as column}
               <td>
                 {#if column.field === 'role'}
-                  <span class="role-badge {getRoleBadgeClass(stakeholder[column.field])}">
-                    {stakeholder[column.field]}
-                  </span>
+                  {#if canDelete}
+                    <select 
+                      value={stakeholder[column.field]}
+                      onchange={(e) => handleRoleChange(stakeholder, e.currentTarget.value)}
+                      class="role-select {getRoleBadgeClass(stakeholder[column.field])}"
+                    >
+                      {#each roleOptions as option}
+                        <option value={option.value}>{option.label}</option>
+                      {/each}
+                    </select>
+                  {:else}
+                    <span class="role-badge {getRoleBadgeClass(stakeholder[column.field])}">
+                      {stakeholder[column.field]}
+                    </span>
+                  {/if}
                 {:else}
                   {stakeholder[column.field]}
                 {/if}
@@ -346,6 +387,81 @@
   .delete-btn:hover {
     background: rgba(255, 82, 82, 0.1);
     color: #ff7070;
+  }
+
+  .role-select {
+    width: 140px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: var(--primary-dark, #1A1A1A);
+    color: var(--text-light, #FFFFFF);
+    border: 1px solid var(--gray-medium, #666666);
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-transform: capitalize;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+    transition: all 0.2s ease;
+  }
+
+  .role-select:hover {
+    border-color: var(--text-light, #FFFFFF);
+  }
+
+  .role-select:focus {
+    outline: none;
+    border-color: var(--text-light, #FFFFFF);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  }
+
+  .role-select.role-admin {
+    border-color: #F44336;
+    color: #F44336;
+    background-color: rgba(244, 67, 54, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23F44336' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .role-select.role-admin:hover,
+  .role-select.role-admin:focus {
+    border-color: #F44336;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+  }
+
+  .role-select.role-supervisor {
+    border-color: #2196F3;
+    color: #2196F3;
+    background-color: rgba(33, 150, 243, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232196F3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .role-select.role-supervisor:hover,
+  .role-select.role-supervisor:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  }
+
+  .role-select.role-user {
+    border-color: #4CAF50;
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .role-select.role-user:hover,
+  .role-select.role-user:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  }
+
+  .role-select option {
+    background: var(--primary-dark, #1A1A1A);
+    color: var(--text-light, #FFFFFF);
+    padding: 8px;
   }
 
   @media (max-width: 768px) {
