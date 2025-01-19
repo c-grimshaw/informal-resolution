@@ -26,7 +26,7 @@
 </script>
 
 <div class="home">
-  <h1>Informal Resolution System</h1>
+  <h1>Informal Resolution Module</h1>
   
   <div class="grievances-section">
     <h2>My Grievances</h2>

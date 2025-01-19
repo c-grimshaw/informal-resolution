@@ -45,6 +45,11 @@
                 <span in:scale={{duration: 150, start: 0.95}}>
                     {auth.user?.email || 'User'}
                 </span>
+                {#if auth.user?.role && auth.user.role !== 'user'}
+                    <span class="role-badge {auth.user.role}">
+                        {auth.user.role}
+                    </span>
+                {/if}
             </button>
             <button class="logout-button" onclick={handleLogout}>Logout</button>
         </div>
@@ -116,6 +121,8 @@
         transition: all 0.2s;
         position: relative;
         overflow: hidden;
+        display: flex;
+        align-items: center;
     }
 
     .user-button span {
@@ -307,5 +314,34 @@
 
     .submit-button:hover {
         background: var(--gray-medium, #666666);
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75em;
+        font-weight: 500;
+        text-transform: capitalize;
+        margin-left: 8px;
+    }
+
+    .role-badge.admin {
+        background: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+        border: 1px solid #F44336;
+    }
+
+    .role-badge.supervisor {
+        background: rgba(33, 150, 243, 0.2);
+        color: #2196F3;
+        border: 1px solid #2196F3;
+    }
+
+    .role-badge.user {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
     }
 </style> 

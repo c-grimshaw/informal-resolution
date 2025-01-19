@@ -4,9 +4,9 @@
 
 <div class="help-view">
   <section class="about">
-    <h1>About the Informal Resolution System</h1>
+    <h1>About the Informal Resolution Module</h1>
     <p>
-      The Informal Resolution System helps track and manage initial grievance communications within military units 
+      The Informal Resolution Module helps track and manage initial grievance communications within military units 
       before entering the formal process.
     </p>
     
