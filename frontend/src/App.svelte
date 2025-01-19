@@ -44,6 +44,13 @@
       loadInitialData();
     }
   });
+
+  $effect(() => {
+    // Keep currentRoute in sync with auth store
+    if (auth.currentRoute) {
+      currentRoute = auth.currentRoute;
+    }
+  });
 </script>
 
 <main>

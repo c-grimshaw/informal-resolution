@@ -4,14 +4,13 @@
   import { get } from '../lib/api/client';
   import GrievanceTable from '../components/GrievanceTable.svelte';
 
-  let userGrievances = $state([]);
-
   async function loadUserGrievances() {
     try {
       const data = await get(`/grievances/user/${auth.user.id}`);
-      userGrievances = data;
+      store.setGrievances(data);
     } catch (error) {
       console.error('Failed to load user grievances:', error);
+      store.setError('Failed to load grievances');
     }
   }
 
@@ -22,7 +21,7 @@
   });
 
   function handleGrievanceDelete(grievanceId) {
-    userGrievances = userGrievances.filter(g => g.id !== grievanceId);
+    store.deleteGrievance(grievanceId);
   }
 </script>
 
@@ -32,7 +31,7 @@
   <div class="grievances-section">
     <h2>My Grievances</h2>
     <GrievanceTable 
-      grievances={userGrievances}
+      grievances={store.grievances}
       showColumns={['grievance_type', 'status', 'created_at']}
       canEditStatus={false}
       readonly={true}
