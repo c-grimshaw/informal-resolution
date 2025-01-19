@@ -30,4 +30,27 @@ export const grievanceStatuses = [
   { value: "pending", label: "Pending" },
   { value: "in_progress", label: "In Progress" },
   { value: "resolved", label: "Resolved" }
+];
+
+export const grievanceTypes = [
+  { 
+    value: "Workplace Conditions", 
+    label: "Workplace Conditions",
+    subtypes: ['Health and Safety', 'Working Hours', 'Equipment', 'Work Environment']
+  },
+  { 
+    value: "Discrimination", 
+    label: "Discrimination",
+    subtypes: ['Age', 'Gender', 'Race', 'Religion', 'Disability', 'Sexual Orientation']
+  },
+  { 
+    value: "Harassment", 
+    label: "Harassment",
+    subtypes: ['Verbal', 'Physical', 'Sexual', 'Psychological', 'Cyber']
+  },
+  { 
+    value: "Other", 
+    label: "Other",
+    subtypes: ['Policy Related', 'Administrative', 'Compensation', 'Other']
+  }
 ]; 
