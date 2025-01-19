@@ -179,6 +179,12 @@
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: var(--text-light, #FFFFFF);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .personal-info, .unit-info {
@@ -195,6 +201,14 @@
     color: var(--text-light, #FFFFFF);
     font-size: 0.85em;
     opacity: 0.9;
+    min-width: 0;
+  }
+
+  .info-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   .content-section {

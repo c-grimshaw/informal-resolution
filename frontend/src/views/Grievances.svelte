@@ -22,13 +22,6 @@
     status: 'pending'
   });
 
-  const grievanceSubTypes = {
-    workplace: ['Health and Safety', 'Working Hours', 'Equipment', 'Work Environment'],
-    discrimination: ['Age', 'Gender', 'Race', 'Religion', 'Disability', 'Sexual Orientation'],
-    harassment: ['Verbal', 'Physical', 'Sexual', 'Psychological', 'Cyber'],
-    other: ['Policy Related', 'Administrative', 'Compensation', 'Other']
-  };
-
   const ranks = [
     { value: "Pte(U)", label: "Sailor 3rd Class / Private / Aviator" },
     { value: "Pte(T)", label: "Sailor 2nd Class / Private (Trained) / Aviator (Trained)" },
@@ -57,10 +50,26 @@
   ];
 
   const grievanceTypes = [
-    { value: "Workplace Conditions", label: "Workplace Conditions" },
-    { value: "Discrimination", label: "Discrimination" },
-    { value: "Harassment", label: "Harassment" },
-    { value: "Other", label: "Other" }
+    { 
+      value: "Workplace Conditions", 
+      label: "Workplace Conditions",
+      subtypes: ['Health and Safety', 'Working Hours', 'Equipment', 'Work Environment']
+    },
+    { 
+      value: "Discrimination", 
+      label: "Discrimination",
+      subtypes: ['Age', 'Gender', 'Race', 'Religion', 'Disability', 'Sexual Orientation']
+    },
+    { 
+      value: "Harassment", 
+      label: "Harassment",
+      subtypes: ['Verbal', 'Physical', 'Sexual', 'Psychological', 'Cyber']
+    },
+    { 
+      value: "Other", 
+      label: "Other",
+      subtypes: ['Policy Related', 'Administrative', 'Compensation', 'Other']
+    }
   ];
 
   function isStepValid(stepNum) {
@@ -243,7 +252,7 @@
               <div class="field-description">Select a more specific category for your grievance</div>
               <select id="grievance_subtype" bind:value={formData.grievance_subtype} required>
                 <option value="">Select Sub-Type</option>
-                {#each grievanceSubTypes[formData.grievance_type] as subType}
+                {#each grievanceTypes.find(t => t.value === formData.grievance_type).subtypes as subType}
                   <option value={subType}>{subType}</option>
                 {/each}
               </select>

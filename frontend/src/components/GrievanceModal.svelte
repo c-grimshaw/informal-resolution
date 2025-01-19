@@ -39,6 +39,7 @@
   function handleCloseClick() {
     closeModal();
   }
+
 </script>
 
 {#if isOpen}
@@ -303,6 +304,52 @@
     color: var(--text-light, #FFFFFF);
     opacity: 0.9;
     white-space: pre-line;
+  }
+
+  .timeline-container {
+    height: 200px;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--gray-darker, #222222);
+    border-radius: 8px;
+  }
+
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .timeline-item {
+    padding: 1rem;
+    background: var(--gray-darker, #222222);
+    border-radius: 8px;
+  }
+
+  .timeline-date {
+    font-size: 0.9rem;
+    color: var(--text-light, #FFFFFF);
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-status {
+    font-weight: 500;
+    color: #64B5F6;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-comment {
+    color: var(--text-light, #FFFFFF);
+    opacity: 0.9;
+    font-size: 0.9rem;
+  }
+
+  .no-timeline {
+    color: var(--text-light, #FFFFFF);
+    opacity: 0.7;
+    text-align: center;
+    padding: 1rem;
   }
 
   @media (max-width: 640px) {

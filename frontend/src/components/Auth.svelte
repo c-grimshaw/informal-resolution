@@ -1,7 +1,8 @@
 <script>
     import { auth } from '../lib/stores/authStore.svelte';
     import { login, register, logout } from '../lib/api/auth';
-    import {store} from '../lib/stores/store.svelte';
+    import { store } from '../lib/stores/store.svelte';
+    import { scale } from 'svelte/transition';
 
     let email = $state('');
     let password = $state('');
@@ -34,7 +35,7 @@
 
 {#if auth.isAuthenticated}
     <div class="auth-status">
-        <span>Logged in as {auth.user?.email}</span>
+        <span class="user-email" in:scale={{duration: 150, start: 0.95}}>{auth.user?.email}</span>
         <button class="logout-btn" onclick={handleLogout}>Logout</button>
     </div>
 {:else}
@@ -105,16 +106,41 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        color: #e0e0e0;
         flex-wrap: wrap;
         max-width: 100%;
     }
 
-    .auth-status span {
+    .user-email {
+        color: #e0e0e0;
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         min-width: 0;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .user-email:hover {
+        color: #C8102E;
+        transform: scale(1.05);
+    }
+
+    .user-email::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(200, 16, 46, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .user-email:hover::before {
+        transform: translateX(0);
     }
 
     .logout-btn {
