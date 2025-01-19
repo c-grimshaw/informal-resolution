@@ -292,7 +292,6 @@
               id="redress_sought"
               bind:value={formData.redress_sought} 
               required
-              placeholder="Explain what actions or changes would resolve this grievance to your satisfaction..."
             ></textarea>
           </div>
         {/if}

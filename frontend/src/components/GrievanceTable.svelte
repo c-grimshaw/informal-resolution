@@ -164,7 +164,7 @@
   }
 
   function getStatusClass(status) {
-    switch(status) {
+    switch(status?.toLowerCase()) {
       case 'pending':
         return 'status-pending';
       case 'in_progress':
@@ -229,7 +229,7 @@
       <AlertCircle size={16} />
       <select 
         bind:value={filters.status}
-        class="filter-input filter-select"
+        class="filter-select"
       >
         <option value="">All Statuses</option>
         {#each statusOptions as option}
@@ -286,9 +286,9 @@
                         value={grievance.status}
                         onchange={(e) => handleStatusChange(grievance, e.currentTarget.value)}
                         class="status-select"
-                        class:pending={grievance.status === 'pending'}
-                        class:in-progress={grievance.status === 'in_progress'}
-                        class:resolved={grievance.status === 'resolved'}
+                        class:status-pending={grievance.status === 'pending'}
+                        class:status-in-progress={grievance.status === 'in_progress'}
+                        class:status-resolved={grievance.status === 'resolved'}
                       >
                         {#each statusOptions as option}
                           <option value={option.value}>{option.label}</option>
@@ -442,93 +442,86 @@
     font-size: 0.8em;
   }
 
+  .filter-group select {
+    width: 100%;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    color: var(--text-light, #FFFFFF);
+    font-size: 0.9em;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+  }
+
+  .filter-group select:focus {
+    outline: none;
+  }
+
+  .filter-group select option {
+    background: var(--primary-dark, #1A1A1A);
+    color: var(--text-light, #FFFFFF);
+    padding: 8px;
+  }
+
   .status-select {
     width: 140px;
     padding: 6px 12px;
     border-radius: 4px;
-    background: var(--primary-dark, #1A1A1A);
+    background-color: var(--primary-dark, #1A1A1A);
     color: var(--text-light, #FFFFFF);
     border: 1px solid var(--gray-medium, #666666);
     cursor: pointer;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-transform: capitalize;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat !important;
+    background-position: calc(100% - 8px) center !important;
+    background-size: 16px;
+    padding-right: 32px;
+    transition: all 0.2s ease;
+  }
+
+  .status-select.status-pending {
+    border-color: #FFA500;
+    color: #FFA500;
+    background-color: rgba(255, 165, 0, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFA500' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .status-select.status-in-progress {
+    border-color: #64B5F6;
+    color: #64B5F6;
+    background-color: rgba(100, 181, 246, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364B5F6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .status-select.status-resolved {
+    border-color: #4CAF50;
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .status-select:hover {
+    border-color: var(--text-light, #FFFFFF);
   }
 
   .status-select:focus {
     outline: none;
     border-color: var(--text-light, #FFFFFF);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
   }
 
-  .status-select.pending {
-    border-color: #FFA500;
-  }
-
-  .status-select.in-progress {
-    border-color: #64B5F6;
-  }
-
-  .status-select.resolved {
-    border-color: #4CAF50;
-  }
-
-  @media (max-width: 768px) {
-    .filters {
-      grid-template-columns: 1fr;
-    }
-
-    .description-cell {
-      max-width: 150px;
-    }
-
-    th, td {
-      padding: 8px 12px;
-    }
-
-    .type-badge, .subtype-badge {
-      display: block;
-      margin: 2px 0;
-    }
-
-    .table-container {
-      height: calc(100vh - 200px);
-    }
-  }
-
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--gray-dark, #333333);
-    border: 1px solid var(--gray-medium, #666666);
-    border-radius: 4px;
-    padding: 0 0.75rem;
-  }
-
-  .filter-group :global(svg) {
-    color: var(--gray-medium, #666666);
-  }
-
-  .filter-group .filter-input {
-    border: none;
-    background: transparent;
-    padding: 8px 0;
-  }
-
-  .filter-group .filter-input:focus {
-    outline: none;
-  }
-
-  .th-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .th-content :global(svg) {
-    color: var(--gray-medium, #666666);
-  }
-
-  .sort-indicator {
-    color: var(--primary-red, #C41E3A);
+  .status-select option {
+    background: var(--primary-dark, #1A1A1A);
+    color: var(--text-light, #FFFFFF);
+    padding: 8px;
   }
 
   .status-container {
@@ -613,30 +606,64 @@
     color: #ff7070;
   }
 
-  .filter-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 16px;
-    padding-right: 32px;
-    font-weight: 500;
-    text-transform: capitalize;
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gray-dark, #333333);
+    border: 1px solid var(--gray-medium, #666666);
+    border-radius: 4px;
+    padding: 0 0.75rem;
   }
 
-  .filter-select:hover {
-    border-color: var(--text-light, #FFFFFF);
+  .filter-group :global(svg) {
+    color: var(--gray-medium, #666666);
   }
 
-  .filter-select:focus {
+  .filter-group .filter-input {
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+  }
+
+  .filter-group .filter-input:focus {
     outline: none;
-    border-color: var(--text-light, #FFFFFF);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
   }
 
-  .filter-select option {
-    background: var(--primary-dark, #1A1A1A);
-    color: var(--text-light, #FFFFFF);
-    padding: 8px;
+  .th-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .th-content :global(svg) {
+    color: var(--gray-medium, #666666);
+  }
+
+  .sort-indicator {
+    color: var(--primary-red, #C41E3A);
+  }
+
+  @media (max-width: 768px) {
+    .filters {
+      grid-template-columns: 1fr;
+    }
+
+    .description-cell {
+      max-width: 150px;
+    }
+
+    th, td {
+      padding: 8px 12px;
+    }
+
+    .type-badge, .subtype-badge {
+      display: block;
+      margin: 2px 0;
+    }
+
+    .table-container {
+      height: calc(100vh - 200px);
+    }
   }
 </style> 

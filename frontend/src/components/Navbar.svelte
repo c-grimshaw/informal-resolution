@@ -40,6 +40,17 @@
                         <span>Grievances</span>
                     </button>
                 </li>
+                {#if auth.isAdmin || auth.isSupervisor}
+                    <li>
+                        <button 
+                            class:active={currentRoute === 'admin'} 
+                            onclick={() => handleNavigation('admin')}
+                        >
+                            <Settings size={16} />
+                            <span>Manage</span>
+                        </button>
+                    </li>
+                {/if}
                 {#if auth.isAdmin}
                     <li>
                         <button 
@@ -48,15 +59,6 @@
                         >
                             <Users size={16} />
                             <span>Stakeholders</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button 
-                            class:active={currentRoute === 'admin'} 
-                            onclick={() => handleNavigation('admin')}
-                        >
-                            <Settings size={16} />
-                            <span>Manage</span>
                         </button>
                     </li>
                 {/if}

@@ -30,15 +30,22 @@
   
   <div class="grievances-section">
     <h2>My Grievances</h2>
-    <GrievanceTable 
-      grievances={store.grievances}
-      showColumns={['grievance_type', 'status', 'created_at']}
-      canEditStatus={false}
-      readonly={true}
-      canDelete={true}
-      onDelete={handleGrievanceDelete}
-      showFilters={false}
-    />
+    {#if store.grievances.length === 0}
+      <div class="empty-state">
+        <p>You have no current grievances in the system.</p>
+        <p>To submit a new grievance, click the "Grievances" button in the navigation bar.</p>
+      </div>
+    {:else}
+      <GrievanceTable 
+        grievances={store.grievances}
+        showColumns={['grievance_type', 'status', 'created_at']}
+        canEditStatus={false}
+        readonly={true}
+        canDelete={true}
+        onDelete={handleGrievanceDelete}
+        showFilters={false}
+      />
+    {/if}
   </div>
 </div>
 
@@ -60,5 +67,27 @@
 
   .grievances-section {
     margin-top: 3rem;
+  }
+
+  .empty-state {
+    background: var(--gray-dark, #333333);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-light, #FFFFFF);
+  }
+
+  .empty-state p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+  }
+
+  .empty-state p:first-child {
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+
+  .empty-state p:last-child {
+    color: var(--gray-light, #999999);
   }
 </style> 
