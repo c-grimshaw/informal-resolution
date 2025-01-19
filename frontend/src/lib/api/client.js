@@ -4,8 +4,19 @@ const BASE_URL = 'http://127.0.0.1:8000';
 
 async function handleResponse(response) {
     if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || response.statusText);
+        let errorMessage;
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || response.statusText;
+        } catch {
+            errorMessage = await response.text() || response.statusText;
+        }
+
+        if (response.status === 401) {
+            auth.logout();
+            throw new Error('Your session has expired. Please log in again.');
+        }
+        throw new Error(errorMessage);
     }
     return response.json();
 }

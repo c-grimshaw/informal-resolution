@@ -5,8 +5,11 @@
   import ViewToggle from '../components/ViewToggle.svelte';
   import StatusChart from '../components/StatusChart.svelte';
   import TrendsChart from '../components/TrendsChart.svelte';
+  import { ChevronDown } from 'lucide-svelte';
+  import { slide } from 'svelte/transition';
 
   let view = $state('table');
+  let isChartsVisible = $state(false);
 
   function handleViewToggle(event) {
     view = event.detail;
@@ -41,9 +44,20 @@
     </div>
   </div>
 
-  <div class="charts-grid">
-    <StatusChart grievances={store.grievances} />
-    <TrendsChart grievances={store.grievances} />
+  <div class="charts-section">
+    <button class="charts-toggle" onclick={() => isChartsVisible = !isChartsVisible}>
+      <span>Analytics Dashboard</span>
+      <div style:transform={isChartsVisible ? 'rotateX(0)' : 'rotateX(180deg)'}>
+        <ChevronDown size={20} />
+      </div>
+    </button>
+    
+    {#if isChartsVisible}
+      <div class="charts-grid" transition:slide>
+        <StatusChart grievances={store.grievances} />
+        <TrendsChart grievances={store.grievances} />
+      </div>
+    {/if}
   </div>
 
   <div class="view-section">
@@ -120,14 +134,40 @@
     color: var(--text-light, #FFFFFF);
   }
 
+  .charts-section {
+    margin: 2rem 0;
+  }
+
+  .charts-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--gray-dark, #333333);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-light, #FFFFFF);
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+  }
+
+  .charts-toggle:hover {
+    background: var(--gray-medium, #444444);
+    transform: translateY(-1px);
+  }
+
+  .charts-toggle div {
+    transition: transform 0.3s ease;
+  }
+
   .charts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
   }
 
   .view-section {

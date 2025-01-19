@@ -2,8 +2,10 @@
   import { store } from '../lib/stores/store.svelte';
   import { put } from '../lib/api/client';
   import KanbanColumn from './KanbanColumn.svelte';
+  import GrievanceModal from './GrievanceModal.svelte';
 
   const { grievances } = $props();
+  let selectedGrievance = $state(null);
 
   const columns = [
     { title: 'Pending', status: 'pending' },
@@ -11,59 +13,57 @@
     { title: 'Resolved', status: 'resolved' }
   ];
 
-  const columnGrievances = (status) => 
-    grievances.filter(g => g.status === status);
+  function getGrievancesForStatus(status) {
+    return store.grievances.filter(g => g.status === status);
+  }
+
+  function handleGrievanceSelect(grievance) {
+    selectedGrievance = grievance;
+  }
+
+  function closeModal() {
+    selectedGrievance = null;
+  }
 
   async function handleStatusChange(grievanceId, newStatus) {
     try {
-      const grievance = grievances.find(g => g.id === grievanceId);
-      if (!grievance) return;
-
-      console.log('Original grievance:', grievance);
-
-      const updatedGrievance = {
-        name: grievance.name || '',
-        serviceNumber: grievance.serviceNumber || '',
-        rank: grievance.rank || '',
-        email: grievance.email || '',
-        phone: grievance.phone || '',
-        unit: grievance.unit || '',
-        position: grievance.position || '',
-        grievanceType: grievance.grievanceType || grievance.grievance_type || '',
-        grievanceSubType: grievance.grievanceSubType || grievance.grievance_subtype || '',
-        description: grievance.description || '',
-        status: newStatus
-      };
-
-      console.log('Updating grievance with data:', JSON.stringify(updatedGrievance, null, 2));
-      
-      // Set loading state
+      console.log(`handleStatusChange called with id: ${grievanceId}, newStatus: ${newStatus}`);
       store.setLoading(true);
       
-      try {
-        const response = await put(`/grievances/${grievanceId}`, updatedGrievance);
-        console.log('Response:', response);
-        
-        // Only update the store if we got a valid response
-        if (response && response.id) {
-          // Update the store with the response data
-          store.updateGrievance(grievanceId, response);
-        } else {
-          throw new Error('Invalid response from server');
-        }
-      } catch (apiError) {
-        console.error('API Error:', apiError);
-        console.error('API Error Response:', apiError.response);
-        console.error('API Error Data:', apiError.response?.data);
-        console.error('API Error Status:', apiError.response?.status);
-        throw apiError;
-      } finally {
-        store.setLoading(false);
+      const grievance = store.grievances.find(g => g.id === grievanceId);
+      if (!grievance) {
+        console.error('Grievance not found:', grievanceId);
+        return false;
       }
+      
+      console.log('Found grievance:', grievance);
+      const updatedGrievance = {
+        name: grievance.name,
+        serviceNumber: grievance.serviceNumber,
+        rank: grievance.rank,
+        email: grievance.email,
+        phone: grievance.phone,
+        unit: grievance.unit,
+        position: grievance.position,
+        grievanceType: grievance.grievanceType,
+        grievanceSubType: grievance.grievanceSubType,
+        description: grievance.description,
+        status: newStatus
+      };
+      
+      console.log('Sending update to API:', updatedGrievance);
+      const response = await put(`/grievances/${grievanceId}`, updatedGrievance);
+      console.log('API response:', response);
+      
+      store.updateGrievance(grievanceId, response);
+      console.log('Store updated successfully');
+      return true;
     } catch (error) {
-      console.error('Failed to update grievance status:', error);
-      console.error('Error details:', error.response?.data || error.message);
+      console.error('Status update failed:', error);
       store.setError('Failed to update status');
+      return false;
+    } finally {
+      store.setLoading(false);
     }
   }
 </script>
@@ -73,11 +73,18 @@
     <KanbanColumn
       title={column.title}
       status={column.status}
-      grievances={columnGrievances(column.status)}
+      grievances={getGrievancesForStatus(column.status)}
       {handleStatusChange}
+      onGrievanceSelect={handleGrievanceSelect}
     />
   {/each}
 </div>
+
+<GrievanceModal 
+  grievance={selectedGrievance}
+  isOpen={selectedGrievance !== null}
+  {closeModal}
+/>
 
 <style>
   .kanban-board {

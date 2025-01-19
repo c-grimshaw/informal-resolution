@@ -47,6 +47,22 @@
     { value: "Col", label: "Colonel / Captain (Navy)" },
   ];
 
+  const units = [
+    { value: "JTF 2", label: "JTF 2" },
+    { value: "CJIRU", label: "CJIRU" },
+    { value: "CSOR", label: "CSOR" },
+    { value: "427SOA", label: "427 SOA" },
+    { value: "CSOTC", label: "CSOTC" },
+    { value: "HQ", label: "HQ" }
+  ];
+
+  const grievanceTypes = [
+    { value: "Workplace Conditions", label: "Workplace Conditions" },
+    { value: "Discrimination", label: "Discrimination" },
+    { value: "Harassment", label: "Harassment" },
+    { value: "Other", label: "Other" }
+  ];
+
   function isStepValid(stepNum) {
     switch(stepNum) {
       case 1:
@@ -96,20 +112,6 @@
     } finally {
       submitting = false;
     }
-  }
-
-  function formatDescription() {
-    return `
-Submitted by: ${formData.submitter_name}
-Service Number: ${formData.service_number}
-Rank: ${formData.rank}
-Contact: ${formData.email} / ${formData.phone}
-Position: ${formData.position}
-Type: ${formData.grievance_type} - ${formData.grievance_subtype}
-
-Details:
-${formData.description}
-    `.trim();
   }
 
   function canSubmitGrievance() {
@@ -169,19 +171,19 @@ ${formData.description}
             <h2>Personal Information</h2>
           </div>
           <div class="form-group">
-            <label>Full Name</label>
+            <label for="submitter_name">Full Name</label>
             <div class="field-description">Enter your legal full name as it appears in official documents</div>
-            <input type="text" bind:value={formData.submitter_name} required>
+            <input type="text" id="submitter_name" bind:value={formData.submitter_name} required>
           </div>
           <div class="form-group">
-            <label>Service Number</label>
+            <label for="service_number">Service Number</label>
             <div class="field-description">Enter your military service number</div>
-            <input type="text" bind:value={formData.service_number} required>
+            <input type="text" id="service_number" bind:value={formData.service_number} required>
           </div>
           <div class="form-group">
-            <label>Rank</label>
+            <label for="rank">Rank</label>
             <div class="field-description">Select your current rank</div>
-            <select bind:value={formData.rank} required>
+            <select id="rank" bind:value={formData.rank} required>
               <option value="">Select Rank</option>
               {#each ranks as rank}
                 <option value={rank.value}>{rank.label}</option>
@@ -189,14 +191,14 @@ ${formData.description}
             </select>
           </div>
           <div class="form-group">
-            <label>Email</label>
+            <label for="email">Email</label>
             <div class="field-description">Provide your primary JSIS email address</div>
-            <input type="email" bind:value={formData.email} placeholder="bloggins.b@sof.cmil.ca" required>
+            <input type="email" id="email" bind:value={formData.email} placeholder="bloggins.b@sof.cmil.ca" required>
           </div>
           <div class="form-group">
-            <label>Phone</label>
+            <label for="phone">Phone</label>
             <div class="field-description">Include area code and any extension if applicable</div>
-            <input type="tel" bind:value={formData.phone} required>
+            <input type="tel" id="phone" bind:value={formData.phone} required>
           </div>
         {/if}
 
@@ -205,22 +207,19 @@ ${formData.description}
             <h2>Unit Details</h2>
           </div>
           <div class="form-group">
-            <label>Unit</label>
+            <label for="unit">Unit</label>
             <div class="field-description">Select your current assigned unit</div>
-            <select bind:value={formData.unit} required>
+            <select id="unit" bind:value={formData.unit} required>
               <option value="">Select Unit</option>
-              <option value="JTF-2">JTF 2</option>
-              <option value="CJIRU">CJIRU</option>
-              <option value="CSOR">CSOR</option>
-              <option value="427SOA">427 SOA</option>
-              <option value="CSOTC">CSOTC</option>
-              <option value="HQ">HQ</option>
+              {#each units as unit}
+                <option value={unit.value}>{unit.label}</option>
+              {/each}
             </select>
           </div>
           <div class="form-group">
-            <label>Position/Role</label>
+            <label for="position">Position/Role</label>
             <div class="field-description">Your current position title / role within the unit</div>
-            <input type="text" bind:value={formData.position} required>
+            <input type="text" id="position" bind:value={formData.position} required>
           </div>
         {/if}
 
@@ -229,21 +228,20 @@ ${formData.description}
             <h2>Grievance Details</h2>
           </div>
           <div class="form-group">
-            <label>Grievance Type</label>
+            <label for="grievance_type">Grievance Type</label>
             <div class="field-description">Select the primary category that best describes your grievance</div>
-            <select bind:value={formData.grievance_type} required>
+            <select id="grievance_type" bind:value={formData.grievance_type} required>
               <option value="">Select Type</option>
-              <option value="workplace">Workplace Conditions</option>
-              <option value="discrimination">Discrimination</option>
-              <option value="harassment">Harassment</option>
-              <option value="other">Other</option>
+              {#each grievanceTypes as type}
+                <option value={type.value}>{type.label}</option>
+              {/each}
             </select>
           </div>
           {#if formData.grievance_type}
             <div class="form-group">
-              <label>Grievance Sub-Type</label>
+              <label for="grievance_subtype">Grievance Sub-Type</label>
               <div class="field-description">Select a more specific category for your grievance</div>
-              <select bind:value={formData.grievance_subtype} required>
+              <select id="grievance_subtype" bind:value={formData.grievance_subtype} required>
                 <option value="">Select Sub-Type</option>
                 {#each grievanceSubTypes[formData.grievance_type] as subType}
                   <option value={subType}>{subType}</option>
@@ -252,14 +250,15 @@ ${formData.description}
             </div>
           {/if}
           <div class="form-group">
-            <label>Description</label>
+            <label for="description">Description</label>
             <div class="field-description">Provide a detailed description of your grievance, including relevant dates, locations, and persons involved</div>
-            <textarea bind:value={formData.description} required></textarea>
+            <textarea id="description" bind:value={formData.description} required></textarea>
           </div>
           <div class="form-group">
-            <label>Redress Sought</label>
+            <label for="redress_sought">Redress Sought</label>
             <div class="field-description">Describe what outcome or resolution you are seeking to resolve this grievance</div>
             <textarea 
+              id="redress_sought"
               bind:value={formData.redress_sought} 
               required
               placeholder="Explain what actions or changes would resolve this grievance to your satisfaction..."
@@ -420,9 +419,24 @@ ${formData.description}
     border-color: var(--text-light, #FFFFFF);
   }
 
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+
+  select:focus {
+    outline: 2px solid var(--primary-red, #C41E3A);
+    outline-offset: 0;
+    border-color: var(--primary-red, #C41E3A);
+  }
+
   select option {
+    padding: 12px;
     background: var(--primary-dark, #1A1A1A);
-    color: var(--text-light, #FFFFFF);
   }
 
   textarea {
@@ -518,33 +532,6 @@ ${formData.description}
     background: var(--primary-dark, #1A1A1A);
     border-radius: 8px;
     margin: 1rem;
-  }
-
-  .success {
-    background: #2e3b2e;
-    border: 1px solid #4CAF50;
-    color: #4CAF50;
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    animation: slideIn 0.3s ease-out;
-  }
-
-  .success button {
-    background: #4CAF50;
-    color: #1a1a1a;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-
-  .success button:hover {
-    background: #45a049;
   }
 
   @keyframes slideIn {

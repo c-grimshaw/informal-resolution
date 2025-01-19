@@ -1,12 +1,17 @@
 <script>
-  import { onMount } from 'svelte';
   import Sortable from 'sortablejs';
   import KanbanCard from './KanbanCard.svelte';
 
   let columnEl;
   let sortable;
 
-  const { title, status, grievances, handleStatusChange } = $props();
+  let {
+    title,
+    status,
+    grievances,
+    handleStatusChange,
+    onGrievanceSelect = $bindable()
+  } = $props();
 
   $effect(() => {
     if (columnEl && !sortable) {
@@ -15,16 +20,25 @@
         animation: 150,
         ghostClass: 'ghost',
         onEnd: async (evt) => {
+          console.log('Drag ended', evt);
           if (evt.from !== evt.to) {
-            const grievanceId = parseInt(evt.item.dataset.id);
-            const newStatus = evt.to.dataset.status;
-            const oldStatus = evt.from.dataset.status;
+            const grievanceId = evt.item.dataset.id;
+            const newStatus = evt.to.closest('.column').dataset.status;
+            const oldStatus = evt.from.closest('.column').dataset.status;
+            
+            console.log('Status change attempt:', { grievanceId, oldStatus, newStatus });
             
             if (newStatus !== oldStatus) {
-              const grievance = grievances.find(g => g.id === grievanceId);
-              if (grievance && grievance.status !== newStatus) {
-                evt.item.remove();
-                await handleStatusChange(grievanceId, newStatus);
+              try {
+                console.log(`Changing status from ${oldStatus} to ${newStatus} for grievance ${grievanceId}`);
+                const success = await handleStatusChange(grievanceId, newStatus);
+                if (!success) {
+                  console.log('Status change failed, reverting card position');
+                  evt.from.appendChild(evt.item);
+                }
+              } catch (error) {
+                console.error('Status change failed:', error);
+                evt.from.appendChild(evt.item);
               }
             }
           }
@@ -44,12 +58,14 @@
 <div class="kanban-column">
   <div class="column" data-status={status}>
     <div class="column-header">
-      <h3>{status.replace('_', ' ').toUpperCase()}</h3>
+      <h3>{title}</h3>
       <span class="count">{grievances.length}</span>
     </div>
     <div class="cards" bind:this={columnEl}>
       {#each grievances as grievance (grievance.id)}
-        <KanbanCard {grievance} />
+        <div class="card-wrapper" data-id={grievance.id}>
+          <KanbanCard {grievance} onSelect={onGrievanceSelect} />
+        </div>
       {/each}
     </div>
   </div>
@@ -133,5 +149,9 @@
     .column-header {
       margin-bottom: 0.75rem;
     }
+  }
+
+  .card-wrapper {
+    width: 100%;
   }
 </style> 

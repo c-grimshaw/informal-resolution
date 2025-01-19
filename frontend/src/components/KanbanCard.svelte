@@ -8,14 +8,11 @@
     Phone,
     Mail,
     Medal,
-    FileText,
     Target
   } from 'lucide-svelte';
   import TypeBadges from './TypeBadges.svelte';
-  import GrievanceModal from './GrievanceModal.svelte';
 
-  let { grievance } = $props();
-  let showModal = $state(false);
+  let { grievance, onSelect = $bindable() } = $props();
 
   function getStatusIcon(status) {
     switch(status) {
@@ -47,15 +44,11 @@
   }
 
   function handleCardClick() {
-    showModal = true;
-  }
-
-  function closeModal() {
-    showModal = false;
+    onSelect(grievance);
   }
 </script>
 
-<div class="kanban-card" class:modal-open={showModal} data-id={grievance.id} onclick={handleCardClick}>
+<div class="kanban-card" data-id={grievance.id} onclick={handleCardClick}>
   <div class="card-header">
     <div class="title">{grievance.title}</div>
     <div class="personal-info">
@@ -117,19 +110,13 @@
   </div>
 </div>
 
-<GrievanceModal 
-  grievance={grievance}
-  isOpen={showModal}
-  closeModal={closeModal}
-/>
-
 <style>
   .kanban-card {
     background: var(--gray-dark, #333333);
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    cursor: grab;
+    cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
@@ -137,7 +124,7 @@
     margin-bottom: 0.75rem;
   }
 
-  .user-info, .unit-info {
+  .unit-info {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -175,22 +162,6 @@
     gap: 0.5rem;
   }
 
-  .status-icon {
-    min-width: 14px;
-  }
-
-  .status-icon.pending {
-    color: #FFA500;
-  }
-
-  .status-icon.in-progress {
-    color: #64B5F6;
-  }
-
-  .status-icon.resolved {
-    color: #4CAF50;
-  }
-
   .status-text {
     text-transform: capitalize;
   }
@@ -201,11 +172,6 @@
 
   .kanban-card:active {
     cursor: grabbing;
-  }
-
-  .kanban-card.modal-open {
-    filter: blur(4px);
-    pointer-events: none;
   }
 
   .title {
@@ -249,6 +215,7 @@
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -256,6 +223,7 @@
 
   .redress {
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     opacity: 0.8;
   }
 </style> 

@@ -42,7 +42,12 @@
 </script>
 
 {#if isOpen}
-  <div class="modal-backdrop" onclick={handleBackdropClick}>
+  <div class="modal-backdrop" 
+    role="button"
+    tabindex="0"
+    onclick={handleBackdropClick}
+    onkeydown={(e) => e.key === 'Escape' && closeModal()}
+  >
     <div class="modal-content" 
       onclick={(e) => e.stopPropagation()}
     >
@@ -59,7 +64,7 @@
 
       <div class="modal-body">
         <div class="info-section">
-          <h3>Personnel Information</h3>
+          <h3>Personal Information</h3>
           <div class="info-grid">
             <div class="info-item">
               <User size={16} />
@@ -110,6 +115,10 @@
           <div class="description">
             <h4>Description</h4>
             <p>{grievance.description}</p>
+          </div>
+          <div class="redress">
+            <h4>Redress Requested</h4>
+            <p>{grievance.redress_sought || 'No redress specified'}</p>
           </div>
         </div>
       </div>
@@ -275,6 +284,25 @@
 
   .field-value {
     text-align: left;
+  }
+
+  .description, .redress {
+    margin-bottom: 1.5rem;
+  }
+
+  .description h4, .redress h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light, #FFFFFF);
+  }
+
+  .description p, .redress p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-light, #FFFFFF);
+    opacity: 0.9;
+    white-space: pre-line;
   }
 
   @media (max-width: 640px) {
