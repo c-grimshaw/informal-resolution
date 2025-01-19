@@ -19,27 +19,26 @@
         group: 'grievances',
         animation: 150,
         ghostClass: 'ghost',
+        sort: false,
         onEnd: async (evt) => {
-          console.log('Drag ended', evt);
           if (evt.from !== evt.to) {
             const grievanceId = evt.item.dataset.id;
             const newStatus = evt.to.closest('.column').dataset.status;
             const oldStatus = evt.from.closest('.column').dataset.status;
             
-            console.log('Status change attempt:', { grievanceId, oldStatus, newStatus });
-            
             if (newStatus !== oldStatus) {
+              evt.item.remove();
               try {
-                console.log(`Changing status from ${oldStatus} to ${newStatus} for grievance ${grievanceId}`);
                 const success = await handleStatusChange(grievanceId, newStatus);
                 if (!success) {
-                  console.log('Status change failed, reverting card position');
                   evt.from.appendChild(evt.item);
                 }
               } catch (error) {
                 console.error('Status change failed:', error);
                 evt.from.appendChild(evt.item);
               }
+            } else {
+              evt.item.remove();
             }
           }
         }
@@ -153,5 +152,9 @@
 
   .card-wrapper {
     width: 100%;
+  }
+
+  .card-wrapper.dragging {
+    opacity: 0.5;
   }
 </style> 

@@ -6,6 +6,12 @@
 
   const { grievances } = $props();
   let selectedGrievance = $state(null);
+  let localGrievances = $state(store.grievances);
+
+  // Keep local state in sync with store
+  $effect(() => {
+    localGrievances = store.grievances;
+  });
 
   const columns = [
     { title: 'Pending', status: 'pending' },
@@ -14,7 +20,7 @@
   ];
 
   function getGrievancesForStatus(status) {
-    return store.grievances.filter(g => g.status === status);
+    return localGrievances.filter(g => g.status === status);
   }
 
   function handleGrievanceSelect(grievance) {
@@ -27,16 +33,14 @@
 
   async function handleStatusChange(grievanceId, newStatus) {
     try {
-      console.log(`handleStatusChange called with id: ${grievanceId}, newStatus: ${newStatus}`);
       store.setLoading(true);
       
-      const grievance = store.grievances.find(g => g.id === grievanceId);
+      const grievance = localGrievances.find(g => g.id === grievanceId);
       if (!grievance) {
         console.error('Grievance not found:', grievanceId);
         return false;
       }
       
-      console.log('Found grievance:', grievance);
       const updatedGrievance = {
         name: grievance.name,
         serviceNumber: grievance.serviceNumber,
@@ -51,12 +55,15 @@
         status: newStatus
       };
       
-      console.log('Sending update to API:', updatedGrievance);
       const response = await put(`/grievances/${grievanceId}`, updatedGrievance);
-      console.log('API response:', response);
       
+      // Update local state first
+      localGrievances = localGrievances.map(g => 
+        g.id === grievanceId ? { ...g, status: newStatus } : g
+      );
+      
+      // Then update store
       store.updateGrievance(grievanceId, response);
-      console.log('Store updated successfully');
       return true;
     } catch (error) {
       console.error('Status update failed:', error);
