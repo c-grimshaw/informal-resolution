@@ -12,6 +12,7 @@
   import Grievances from './views/Grievances.svelte';
   import Stakeholders from './views/Stakeholders.svelte';
   import Admin from './views/Admin.svelte';
+  import Help from './views/Help.svelte';
   
   let currentRoute = $state('home');
   
@@ -75,6 +76,8 @@
       <Stakeholders />
     {:else if currentRoute === 'admin'}
       <Admin />
+    {:else if currentRoute === 'help'}
+      <Help />
     {/if}
   </div>
 </main>

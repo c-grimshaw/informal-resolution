@@ -96,10 +96,10 @@
   }
 
   h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
     color: var(--text-light, #FFFFFF);
-    font-weight: 300;
-    font-size: 2rem;
-    margin: 0;
+    margin: 0 0 1.5rem 0;
   }
 
   .stats-grid {
@@ -183,9 +183,9 @@
   }
 
   .view-header h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
     color: var(--text-light, #FFFFFF);
-    font-weight: 300;
-    font-size: 1.5rem;
     margin: 0;
   }
 

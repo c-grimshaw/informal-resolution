@@ -5,7 +5,8 @@
         Home as HomeIcon, 
         FileText, 
         Users, 
-        Settings 
+        Settings,
+        HelpCircle 
     } from 'lucide-svelte';
     import Auth from './Auth.svelte';
 
@@ -59,6 +60,15 @@
                         </button>
                     </li>
                 {/if}
+                <li>
+                    <button 
+                        class:active={currentRoute === 'help'} 
+                        onclick={() => handleNavigation('help')}
+                    >
+                        <HelpCircle size={16} />
+                        <span>Help</span>
+                    </button>
+                </li>
             {/if}
         </ul>
         <div class="auth-container">

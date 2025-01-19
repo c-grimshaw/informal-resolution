@@ -4,9 +4,10 @@
     Building2, 
     Phone,
     Mail,
-    Star,
+    Medal,
     Briefcase,
-    X
+    X,
+    Hash
   } from 'lucide-svelte';
   import TypeBadges from './TypeBadges.svelte';
   
@@ -73,12 +74,12 @@
               <span>{grievance.submitter_name}</span>
             </div>
             <div class="info-item">
-              <Star size={16} />
+              <Hash size={16} />
               <span class="label">Service Number:</span>
               <span>{grievance.service_number}</span>
             </div>
             <div class="info-item">
-              <Star size={16} />
+              <Medal size={16} />
               <span class="label">Rank:</span>
               <span>{grievance.rank}</span>
             </div>
@@ -252,7 +253,7 @@
   }
 
   .info-item :global(svg) {
-    color: #64B5F6;
+    color: #C8102E;
   }
 
   .label {
