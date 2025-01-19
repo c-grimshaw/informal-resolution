@@ -2,12 +2,15 @@
   import { store } from '../lib/stores/store.svelte';
   import { post } from '../lib/api/client';
   import { auth } from '../lib/stores/authStore.svelte';
+  import { onMount } from 'svelte';
+  import { grievanceStatuses } from '../lib/constants';
 
   let formEl = $state(null);
   let submitting = $state(false);
   let step = $state(1);
 
-  const formData = $state({
+  // Initialize formData with saved state or defaults
+  const formData = $state(loadFormState() || {
     submitter_name: '',
     service_number: '',
     rank: '',
@@ -20,6 +23,52 @@
     description: '',
     redress_sought: '',
     status: 'pending'
+  });
+
+  // Load saved form state from localStorage
+  function loadFormState() {
+    try {
+      const savedState = localStorage.getItem('grievanceFormState');
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        // Also restore the step if it was saved
+        const savedStep = localStorage.getItem('grievanceFormStep');
+        if (savedStep) {
+          step = parseInt(savedStep, 10);
+        }
+        return parsedState;
+      }
+    } catch (error) {
+      console.error('Error loading form state:', error);
+    }
+    return null;
+  }
+
+  // Save form state to localStorage
+  function saveFormState() {
+    try {
+      localStorage.setItem('grievanceFormState', JSON.stringify(formData));
+      localStorage.setItem('grievanceFormStep', step.toString());
+    } catch (error) {
+      console.error('Error saving form state:', error);
+    }
+  }
+
+  // Clear saved form state
+  function clearFormState() {
+    try {
+      localStorage.removeItem('grievanceFormState');
+      localStorage.removeItem('grievanceFormStep');
+    } catch (error) {
+      console.error('Error clearing form state:', error);
+    }
+  }
+
+  // Watch for changes in formData and step
+  $effect(() => {
+    if (canSubmitGrievance()) {
+      saveFormState();
+    }
   });
 
   const ranks = [
@@ -115,7 +164,7 @@
       });
       
       store.addGrievance(response);
-      resetForm();
+      resetForm(); // This will also clear the saved state
       store.setError('✓ Grievance submitted successfully');
     } catch (error) {
       store.setError('Failed to submit grievance: ' + error.message);
@@ -128,6 +177,7 @@
     return auth.isAuthenticated;
   }
 
+  // Reset form and clear saved state
   function resetForm() {
     formData.submitter_name = '';
     formData.service_number = '';
@@ -141,7 +191,17 @@
     formData.description = '';
     formData.redress_sought = '';
     step = 1;
+    clearFormState();
   }
+
+  // Add cleanup on component unmount
+  onMount(() => {
+    return () => {
+      if (!isFormValid()) {
+        saveFormState(); // Save state when navigating away if form is incomplete
+      }
+    };
+  });
 </script>
 
 {#if !canSubmitGrievance()}

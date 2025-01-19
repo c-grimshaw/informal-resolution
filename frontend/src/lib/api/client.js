@@ -21,57 +21,27 @@ async function handleResponse(response) {
     return response.json();
 }
 
-export async function get(endpoint) {
-    const headers = new Headers();
-    if (auth.token) {
-        headers.append('Authorization', `Bearer ${auth.token}`);
-    }
-    
-    const response = await fetch(`${BASE_URL}${endpoint}`, { headers });
-    return handleResponse(response);
-}
-
-export async function post(endpoint, data) {
+async function request(endpoint, options = {}) {
     const headers = new Headers({
-        'Content-Type': 'application/json'
+        ...(options.body && { 'Content-Type': 'application/json' })
     });
+    
     if (auth.token) {
         headers.append('Authorization', `Bearer ${auth.token}`);
     }
-    
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'POST',
+
+    const config = {
+        ...options,
         headers,
-        body: JSON.stringify(data)
-    });
+        body: options.body ? JSON.stringify(options.body) : undefined
+    };
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, config);
     return handleResponse(response);
 }
 
-export async function put(endpoint, data) {
-    const headers = new Headers({
-        'Content-Type': 'application/json'
-    });
-    if (auth.token) {
-        headers.append('Authorization', `Bearer ${auth.token}`);
-    }
-    
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(data)
-    });
-    return handleResponse(response);
-}
-
-export async function del(endpoint) {
-    const headers = new Headers();
-    if (auth.token) {
-        headers.append('Authorization', `Bearer ${auth.token}`);
-    }
-    
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'DELETE',
-        headers
-    });
-    return handleResponse(response);
-} 
+export const get = (endpoint) => request(endpoint);
+export const post = (endpoint, data) => request(endpoint, { method: 'POST', body: data });
+export const put = (endpoint, data) => request(endpoint, { method: 'PUT', body: data });
+export const patch = (endpoint, data) => request(endpoint, { method: 'PATCH', body: data });
+export const del = (endpoint) => request(endpoint, { method: 'DELETE' }); 
