@@ -27,24 +27,10 @@
 </script>
 
 <div class="home">
-  <h1>Welcome to the Grievance Management System</h1>
+  <h1>Informal Resolution System</h1>
   
-  <div class="stats">
-    <div class="stat-card">
-      <h3>Your Active Grievances</h3>
-      <p class="stat-number">{userGrievances.length}</p>
-    </div>
-    
-    {#if auth.isSupervisor}
-      <div class="stat-card">
-        <h3>Total Stakeholders</h3>
-        <p class="stat-number">{store.stakeholders.length}</p>
-      </div>
-    {/if}
-  </div>
-
   <div class="grievances-section">
-    <h2>Your Grievances</h2>
+    <h2>My Grievances</h2>
     <GrievanceTable 
       grievances={userGrievances}
       showColumns={['grievance_type', 'status', 'created_at']}
@@ -73,39 +59,7 @@
     text-align: left;
   }
 
-  .stats {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-
-  .stat-card {
-    background: var(--gray-dark, #333333);
-    padding: 1.5rem;
-    border-radius: 8px;
-    min-width: 200px;
-    border: 1px solid var(--gray-medium, #666666);
-  }
-
-  .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--primary-red, #C41E3A);
-  }
-
   .grievances-section {
     margin-top: 3rem;
-  }
-
-  @media (max-width: 768px) {
-    .stats {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .stat-card {
-      width: 100%;
-    }
   }
 </style> 

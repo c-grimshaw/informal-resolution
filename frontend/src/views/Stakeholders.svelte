@@ -14,7 +14,8 @@
   async function fetchStakeholders() {
     try {
       store.setLoading(true);
-      const response = await get('http://localhost:8000/users/all');
+      const response = await get('/users/all');
+      console.log(response);
       stakeholders = response;
     } catch (error) {
       store.setError('Failed to fetch stakeholders');

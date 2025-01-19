@@ -153,8 +153,4 @@
   .card-wrapper {
     width: 100%;
   }
-
-  .card-wrapper.dragging {
-    opacity: 0.5;
-  }
 </style> 

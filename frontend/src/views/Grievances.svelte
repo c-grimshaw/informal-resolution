@@ -41,12 +41,13 @@
   ];
 
   const units = [
-    { value: "JTF 2", label: "JTF 2" },
+    { value: "427SOA", label: "427 SOA" },
     { value: "CJIRU", label: "CJIRU" },
     { value: "CSOR", label: "CSOR" },
-    { value: "427SOA", label: "427 SOA" },
     { value: "CSOTC", label: "CSOTC" },
-    { value: "HQ", label: "HQ" }
+    { value: "HQ", label: "HQ" },
+    { value: "JTF 2", label: "JTF 2" },
+    { value: "SOF MPU", label: "SOF MPU"}
   ];
 
   const grievanceTypes = [
