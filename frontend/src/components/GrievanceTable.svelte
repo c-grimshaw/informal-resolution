@@ -418,6 +418,15 @@
   tr:hover {
     background: rgba(255, 255, 255, 0.05);
     cursor: pointer;
+    transform: scale(1.005);
+    transition: all 0.2s ease;
+    z-index: 1;
+  }
+
+  tr {
+    position: relative;
+    transition: all 0.2s ease;
+    transform-origin: center;
   }
 
   .description-cell {
