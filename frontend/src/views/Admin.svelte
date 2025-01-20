@@ -7,6 +7,7 @@
   import ViewToggle from '../components/ViewToggle.svelte';
   import StatusChart from '../components/StatusChart.svelte';
   import TrendsChart from '../components/TrendsChart.svelte';
+  import UnitDistributionChart from '../components/UnitDistributionChart.svelte';
   import { ChevronDown } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import { onMount } from 'svelte';
@@ -70,9 +71,12 @@
       </button>
       
       {#if isChartsVisible}
-        <div class="charts-grid" transition:slide>
+        <div class="charts-grid" transition:slide class:two-charts={!auth.isAdmin}>
           <StatusChart grievances={store.grievances} />
           <TrendsChart grievances={store.grievances} />
+          {#if auth.isAdmin}
+            <UnitDistributionChart grievances={store.grievances} />
+          {/if}
         </div>
       {/if}
     </div>
@@ -81,12 +85,10 @@
   <div class="view-section">
     <div class="view-header">
       <h2>Grievance Management Board</h2>
-      {#if auth.isAdmin}
         <ViewToggle {view} on:toggle={handleViewToggle} />
-      {/if}
     </div>
     <div class="content">
-      {#if view === 'kanban' && auth.isAdmin}
+      {#if view === 'kanban'}
         <KanbanBoard grievances={store.grievances} />
       {:else}
         <GrievanceTable 
@@ -178,9 +180,13 @@
 
   .charts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-top: 1rem;
+  }
+
+  .charts-grid.two-charts {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .view-section {
@@ -208,8 +214,11 @@
 
   @media (max-width: 1200px) {
     .charts-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid.two-charts {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -233,8 +242,8 @@
       gap: 0.75rem;
     }
 
-    .charts-grid {
-      gap: 1rem;
+    .charts-grid, .charts-grid.two-charts {
+      grid-template-columns: 1fr;
     }
 
     .view-header {

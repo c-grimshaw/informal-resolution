@@ -1,7 +1,7 @@
 <script>
   import { store } from '../lib/stores/store.svelte';
   import { auth } from '../lib/stores/authStore.svelte';
-  import { del, patch } from '../lib/api/client';
+  import { patch } from '../lib/api/client';
   import { 
     ArrowUp,
     ArrowDown,
@@ -10,15 +10,12 @@
     Mail,
     Shield,
     Medal,
-    Target,
-    X
+    Target
   } from 'lucide-svelte';
 
   let { 
     stakeholders = [],
-    showFilters = true,
-    canDelete = false,
-    onDelete = null
+    showFilters = true
   } = $props();
 
   const roleOptions = [
@@ -71,29 +68,15 @@
     }
   }
 
-  async function handleDelete(stakeholder, event) {
-    event.stopPropagation();
-    
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      await del(`/users/${stakeholder.id}`);
-      if (onDelete) {
-        onDelete(stakeholder.id);
-      }
-    } catch (error) {
-      store.setError('Failed to delete user');
-    }
-  }
-
   async function handleRoleChange(stakeholder, newRole) {
     try {
       store.setLoading(true);
+      console.log('Attempting role change:', { userId: stakeholder.id, newRole });
       const response = await patch(`/users/${stakeholder.id}`, {
         role: newRole
       });
+      console.log('Role change response:', response);
+      
       // Update the stakeholder in the local state
       stakeholders = stakeholders.map(s => 
         s.id === stakeholder.id ? { ...s, role: newRole } : s
@@ -104,6 +87,7 @@
       }
       store.setError('✓ Role updated successfully');
     } catch (error) {
+      console.error('Role change error:', error);
       store.setError('Failed to update role: ' + error.message);
     } finally {
       store.setLoading(false);
@@ -183,9 +167,6 @@
               </div>
             </th>
           {/each}
-          {#if canDelete}
-            <th></th>
-          {/if}
         </tr>
       </thead>
       <tbody>
@@ -194,7 +175,7 @@
             {#each columns as column}
               <td>
                 {#if column.field === 'role'}
-                  {#if canDelete}
+                  {#if auth.isAdmin && stakeholder.id !== auth.user?.id}
                     <select 
                       value={stakeholder[column.field]}
                       onchange={(e) => handleRoleChange(stakeholder, e.currentTarget.value)}
@@ -214,17 +195,6 @@
                 {/if}
               </td>
             {/each}
-            {#if canDelete}
-              <td class="delete-cell">
-                <button 
-                  class="delete-btn"
-                  onclick={(e) => handleDelete(stakeholder, e)}
-                  title="Delete user"
-                >
-                  <X size={16} />
-                </button>
-              </td>
-            {/if}
           </tr>
         {/each}
       </tbody>

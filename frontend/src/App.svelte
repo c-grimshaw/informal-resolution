@@ -3,6 +3,7 @@
   import {store } from './lib/stores/store.svelte';
   import { auth } from './lib/stores/authStore.svelte';
   import { get } from './lib/api/client';
+  import { Shield, User, Target } from 'lucide-svelte';
   
   // Components
   import Navbar from './components/Navbar.svelte';
@@ -72,8 +73,35 @@
 
   <div class="content">
     {#if !auth.isAuthenticated}
-      <div class="message">
-        Please log in to access the application.
+      <div class="welcome-container">
+        <div class="welcome-content">
+          <h1>Welcome to the Informal Grievance Module</h1>
+          <h2>Resolve issues at the lowest level.</h2>
+          
+          <div class="features">
+            <div class="feature-card">
+              <Shield size={24} />
+              <h3>Secure Grievance Management</h3>
+              <p>A secure platform for personnel to submit and track grievances with confidentiality.</p>
+            </div>
+            
+            <div class="feature-card">
+              <User size={24} />
+              <h3>Role-Based Access</h3>
+              <p>Dedicated interfaces for users, supervisors, and administrators to ensure proper handling of cases.</p>
+            </div>
+            
+            <div class="feature-card">
+              <Target size={24} />
+              <h3>Real-Time Updates</h3>
+              <p>Track the status of your grievances in real-time with a transparent resolution process.</p>
+            </div>
+          </div>
+
+          <div class="auth-prompt">
+            <p>Please log in to access the application. New users should register using their JSIS credentials.</p>
+          </div>
+        </div>
       </div>
     {:else if currentRoute === 'home'}
       <Home />
@@ -264,5 +292,106 @@
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+  .welcome-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem;
+  }
+
+  .welcome-content {
+    max-width: 900px;
+    text-align: center;
+  }
+
+  .welcome-content h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary-red, #C41E3A);
+  }
+
+  .welcome-content h2 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0.5rem 0 2rem;
+    color: var(--text-light, #e0e0e0);
+    opacity: 0.8;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+
+  .feature-card {
+    background: var(--gray-dark, #333333);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .feature-card :global(svg) {
+    color: var(--primary-red, #C41E3A);
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 1rem;
+    color: var(--text-light, #e0e0e0);
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--text-light, #e0e0e0);
+    opacity: 0.8;
+  }
+
+  .auth-prompt {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: var(--primary-dark, #1A1A1A);
+    border-radius: 8px;
+    border: 1px solid var(--gray-medium, #666666);
+  }
+
+  .auth-prompt p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-light, #e0e0e0);
+  }
+
+  @media (max-width: 768px) {
+    .features {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .welcome-content h1 {
+      font-size: 2rem;
+    }
+
+    .welcome-content h2 {
+      font-size: 1rem;
+    }
+
+    .feature-card {
+      padding: 1.5rem;
+    }
   }
 </style>

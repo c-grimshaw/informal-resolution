@@ -2,19 +2,10 @@
   import { onMount } from 'svelte';
   import { get } from '../lib/api/client';
   import { store } from '../lib/stores/store.svelte';
-  import { auth } from '../lib/stores/authStore.svelte';
   import StakeholdersTable from '../components/StakeholdersTable.svelte';
 
-  let stakeholders = $state([]);
-
-  onMount(() => {
-    fetchStakeholders();
-    // Listen for profile updates
-    window.addEventListener('profileUpdate', fetchStakeholders);
-    // Return cleanup function
-    return () => {
-      window.removeEventListener('profileUpdate', fetchStakeholders);
-    };
+  onMount(async () => {
+    await fetchStakeholders();
   });
 
   async function fetchStakeholders() {
@@ -22,16 +13,12 @@
       store.setLoading(true);
       const response = await get('/users/all');
       console.log(response);
-      stakeholders = response;
+      store.setStakeholders(response);
     } catch (error) {
       store.setError('Failed to fetch stakeholders');
     } finally {
       store.setLoading(false);
     }
-  }
-
-  function handleDelete(userId) {
-    stakeholders = stakeholders.filter(s => s.id !== userId);
   }
 </script>
 
@@ -41,9 +28,7 @@
   </header>
 
   <StakeholdersTable 
-    stakeholders={stakeholders}
-    canDelete={auth.isAdmin}
-    onDelete={handleDelete}
+    stakeholders={store.stakeholders}
   />
 </div>
 
