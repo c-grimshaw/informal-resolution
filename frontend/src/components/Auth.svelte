@@ -102,12 +102,15 @@
         display: flex;
         align-items: center;
         gap: 1rem;
+        width: 100%;
     }
 
     .user-info {
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        width: 100%;
+        justify-content: flex-end;
     }
 
     .user-button {
@@ -128,6 +131,10 @@
     .user-button span {
         position: relative;
         z-index: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
     }
 
     .user-button:hover {
@@ -160,6 +167,7 @@
         border-radius: 4px;
         cursor: pointer;
         transition: all 0.2s;
+        white-space: nowrap;
     }
 
     .logout-button:hover {
@@ -169,19 +177,23 @@
 
     .login-form {
         display: flex;
-        gap: 0.5rem;
         align-items: center;
-        height: 100%;
+        background: var(--primary-dark, #1A1A1A);
+        padding: 0.5rem;
+        border-radius: 4px;
+        gap: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
     }
 
     .form-group {
         margin: 0;
-        width: 100%;
         position: relative;
+        width: 140px;
     }
 
     .form-group input {
-        width: 150px;
+        width: 100%;
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
         border-radius: 4px;
@@ -204,48 +216,6 @@
     .form-actions {
         display: flex;
         gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .auth-status {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-        max-width: 100%;
-    }
-
-    .user-email {
-        color: #e0e0e0;
-        padding: 0.5rem 0.75rem;
-        border-radius: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-        transition: all 0.2s ease;
-        position: relative;
-    }
-
-    .user-email:hover {
-        color: #C8102E;
-        transform: scale(1.05);
-    }
-
-    .user-email::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(200, 16, 46, 0.1);
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-
-    .user-email:hover::before {
-        transform: translateX(0);
     }
 
     .submit-button {
@@ -285,58 +255,6 @@
         transform: translateY(-1px);
     }
 
-    /* Tablet breakpoint */
-    @media (max-width: 1024px) {
-        .form-group input {
-            width: 130px;
-        }
-    }
-
-    /* Mobile breakpoint */
-    @media (max-width: 768px) {
-        .login-form {
-            flex-direction: column;
-            width: 100%;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--primary-dark, #1A1A1A);
-            border-radius: 4px;
-        }
-
-        .form-group {
-            width: 100%;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            font-size: 1rem;
-        }
-
-        .form-actions {
-            width: 100%;
-            justify-content: stretch;
-            margin-top: 0.5rem;
-        }
-
-        button {
-            flex: 1;
-            padding: 0.75rem;
-            font-size: 1rem;
-        }
-    }
-
-    /* Small mobile breakpoint */
-    @media (max-width: 480px) {
-        .form-actions {
-            flex-direction: column;
-        }
-
-        button {
-            width: 100%;
-        }
-    }
-
     .role-badge {
         display: inline-flex;
         align-items: center;
@@ -364,5 +282,80 @@
         background: rgba(76, 175, 80, 0.2);
         color: #4CAF50;
         border: 1px solid #4CAF50;
+    }
+
+    /* Mobile breakpoint */
+    @media (max-width: 768px) {
+        .auth-container {
+            padding: 0.5rem;
+            background: var(--primary-dark, #1A1A1A);
+            border-radius: 4px;
+        }
+
+        .user-info {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .user-button {
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .user-button span {
+            max-width: 150px;
+        }
+
+        .logout-button {
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .login-form {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            justify-content: stretch;
+        }
+
+        .form-group {
+            width: 100%;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .form-actions {
+            width: 100%;
+            gap: 0.75rem;
+        }
+
+        button {
+            padding: 0.75rem;
+            font-size: 1rem;
+            justify-content: center;
+        }
+    }
+
+    /* Small mobile breakpoint */
+    @media (max-width: 480px) {
+        .auth-container {
+            padding: 0.75rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .user-button span {
+            max-width: 120px;
+        }
+
+        button {
+            width: 100%;
+        }
     }
 </style> 

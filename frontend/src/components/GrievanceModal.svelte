@@ -83,8 +83,8 @@
 
 {#if isOpen}
   <div class="modal-backdrop" 
-    role="button"
-    tabindex="0"
+    role="dialog"
+    aria-modal="true"
     onclick={handleBackdropClick}
     onkeydown={(e) => e.key === 'Escape' && closeModal()}
   >
@@ -165,14 +165,18 @@
         <hr class="divider" />
 
         <div class="notes-section">
-          <div class="section-header" onclick={() => isNotesExpanded = !isNotesExpanded}>
+          <button 
+            class="section-header" 
+            onclick={() => isNotesExpanded = !isNotesExpanded}
+            onkeydown={(e) => e.key === 'Enter' && (isNotesExpanded = !isNotesExpanded)}
+          >
             <h3>Notes</h3>
             {#if isNotesExpanded}
               <ChevronUp size={20} />
             {:else}
               <ChevronDown size={20} />
             {/if}
-          </div>
+          </button>
           
           {#if isNotesExpanded}
             <div class="notes-content">
@@ -455,6 +459,10 @@
     cursor: pointer;
     user-select: none;
     border-radius: 4px 4px 0 0;
+    width: 100%;
+    border: none;
+    color: inherit;
+    text-align: left;
   }
 
   .section-header:hover {

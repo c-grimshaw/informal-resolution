@@ -3,7 +3,7 @@
   import { post } from '../lib/api/client';
   import { auth } from '../lib/stores/authStore.svelte';
   import { onMount } from 'svelte';
-  import { grievanceStatuses, ranks, units, grievanceTypes } from '../lib/constants';
+  import {  ranks, units, grievanceTypes } from '../lib/constants';
 
   let formEl = $state(null);
   let submitting = $state(false);
