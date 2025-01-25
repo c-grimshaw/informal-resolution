@@ -8,20 +8,15 @@
     Briefcase,
     X,
     Hash,
-    ChevronDown,
-    ChevronUp
   } from 'lucide-svelte';
   import TypeBadges from './TypeBadges.svelte';
-  import { auth } from '../lib/stores/authStore.svelte';
+  import GrievanceNotes from './GrievanceNotes.svelte';
   import { store } from '../lib/stores/store.svelte';
-  import { get, patch, post } from '../lib/api/client';
-  import { grievanceStatuses } from '../lib/constants';
+  import { get } from '../lib/api/client';
+  import { slide } from 'svelte/transition';
   
   let { grievance = null, isOpen = false, closeModal = $bindable() } = $props();
-  let submitting = $state(false);
   let notes = $state([]);
-  let newNote = $state('');
-  let isNotesExpanded = $state(true);
 
   async function loadNotes() {
     if (!grievance) return;
@@ -30,24 +25,6 @@
       notes = response;
     } catch (error) {
       store.setError('Failed to load notes: ' + error.message);
-    }
-  }
-
-  async function addNote() {
-    if (!newNote.trim()) return;
-    
-    try {
-      submitting = true;
-      const response = await post(`/grievances/${grievance.id}/notes`, {
-        content: newNote.trim()
-      });
-      notes = [response, ...notes];
-      newNote = '';
-      isNotesExpanded = true;
-    } catch (error) {
-      store.setError('Failed to add note: ' + error.message);
-    } finally {
-      submitting = false;
     }
   }
 
@@ -90,6 +67,7 @@
   >
     <div class="modal-content" 
       onclick={(e) => e.stopPropagation()}
+      transition:slide
     >
       <button class="close-button" onclick={handleCloseClick}>
         <X size={24} />
@@ -164,50 +142,7 @@
 
         <hr class="divider" />
 
-        <div class="notes-section">
-          <button 
-            class="section-header" 
-            onclick={() => isNotesExpanded = !isNotesExpanded}
-            onkeydown={(e) => e.key === 'Enter' && (isNotesExpanded = !isNotesExpanded)}
-          >
-            <h3>Notes</h3>
-            {#if isNotesExpanded}
-              <ChevronUp size={20} />
-            {:else}
-              <ChevronDown size={20} />
-            {/if}
-          </button>
-          
-          {#if isNotesExpanded}
-            <div class="notes-content">
-              <form onsubmit={e => { e.preventDefault(); addNote(); }} class="note-form">
-                <textarea
-                  bind:value={newNote}
-                  placeholder="Add a note..."
-                  rows="3"
-                  disabled={submitting}
-                ></textarea>
-                <button type="submit" disabled={submitting || !newNote.trim()}>
-                  Add Note
-                </button>
-              </form>
-
-              <div class="notes-list">
-                {#each notes as note (note.id)}
-                  <div class="note">
-                    <div class="note-header">
-                      <span class="note-author">{note.user_name}</span>
-                      <span class="note-date">{formatDate(note.created_at)}</span>
-                    </div>
-                    <div class="note-content">
-                      {note.content}
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            </div>
-          {/if}
-        </div>
+        <GrievanceNotes grievanceId={grievance.id} />
       </div>
     </div>
   </div>
@@ -240,7 +175,6 @@
     overflow-y: auto;
     position: relative;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    animation: slideIn 0.2s ease-out;
     text-align: left;
   }
 
@@ -254,17 +188,6 @@
       opacity: 1;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-    }
-  }
-
-  @keyframes slideIn {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
     }
   }
 
@@ -364,15 +287,6 @@
     opacity: 0.9;
   }
 
-  .field-label {
-    text-align: left;
-    margin-bottom: 0.5rem;
-  }
-
-  .field-value {
-    text-align: left;
-  }
-
   .description, .redress {
     margin-bottom: 1.5rem;
   }
@@ -392,154 +306,10 @@
     white-space: pre-line;
   }
 
-  .timeline-container {
-    height: 200px;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: var(--gray-darker, #222222);
-    border-radius: 8px;
-  }
-
-  .timeline-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .timeline-item {
-    padding: 1rem;
-    background: var(--gray-darker, #222222);
-    border-radius: 8px;
-  }
-
-  .timeline-date {
-    font-size: 0.9rem;
-    color: var(--text-light, #FFFFFF);
-    opacity: 0.7;
-    margin-bottom: 0.5rem;
-  }
-
-  .timeline-status {
-    font-weight: 500;
-    color: #64B5F6;
-    margin-bottom: 0.5rem;
-  }
-
-  .timeline-comment {
-    color: var(--text-light, #FFFFFF);
-    opacity: 0.9;
-    font-size: 0.9rem;
-  }
-
-  .no-timeline {
-    color: var(--text-light, #FFFFFF);
-    opacity: 0.7;
-    text-align: center;
-    padding: 1rem;
-  }
-
   .divider {
     border: none;
     border-top: 1px solid var(--gray-medium, #666666);
     margin: 1.5rem 0;
-  }
-
-  .notes-section {
-    margin-top: 1rem;
-    border: 1px solid var(--gray-medium, #666666);
-    border-radius: 4px;
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: var(--primary-dark, #1A1A1A);
-    cursor: pointer;
-    user-select: none;
-    border-radius: 4px 4px 0 0;
-    width: 100%;
-    border: none;
-    color: inherit;
-    text-align: left;
-  }
-
-  .section-header:hover {
-    background: var(--gray-dark, #333333);
-  }
-
-  .section-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-
-  .notes-content {
-    padding: 1rem;
-  }
-
-  .note-form {
-    margin-bottom: 1rem;
-  }
-
-  .note-form textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--gray-medium, #666666);
-    border-radius: 4px;
-    background: var(--gray-dark, #333333);
-    color: var(--text-light, #FFFFFF);
-    resize: vertical;
-    margin-bottom: 0.5rem;
-  }
-
-  .note-form button {
-    padding: 0.5rem 1rem;
-    background: var(--primary-red, #C41E3A);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .note-form button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .notes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .note {
-    background: var(--gray-dark, #333333);
-    border: 1px solid var(--gray-medium, #666666);
-    border-radius: 4px;
-    padding: 1rem;
-  }
-
-  .note-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .note-author {
-    font-weight: 500;
-    color: var(--primary-red, #C41E3A);
-  }
-
-  .note-date {
-    color: var(--gray-light, #999999);
-  }
-
-  .note-content {
-    white-space: pre-wrap;
-    color: var(--text-light, #FFFFFF);
   }
 
   @media (max-width: 640px) {

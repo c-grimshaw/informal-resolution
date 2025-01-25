@@ -33,7 +33,10 @@
         }
     }
 
-    function handleLogout() {
+    async function handleLogout() {
+        // Clear any form states from localStorage
+        localStorage.removeItem('grievanceFormState');
+        localStorage.removeItem('grievanceFormStep');
         logout();
     }
 </script>

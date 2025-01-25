@@ -10,7 +10,7 @@
     Medal,
     Target
   } from 'lucide-svelte';
-  import TypeBadges from './TypeBadges.svelte';
+  import TypeBadges from '../TypeBadges.svelte';
 
   let { grievance, onSelect = $bindable() } = $props();
 

@@ -4,6 +4,7 @@
   import { store } from '../lib/stores/store.svelte';
   import StakeholdersTable from '../components/StakeholdersTable.svelte';
 
+
   onMount(async () => {
     await fetchStakeholders();
   });

@@ -1,10 +1,9 @@
 <script>
-  import { store } from '../lib/stores/store.svelte';
-  import { put } from '../lib/api/client';
+  import { store } from '../../lib/stores/store.svelte';
+  import { put } from '../../lib/api/client';
   import KanbanColumn from './KanbanColumn.svelte';
-  import GrievanceModal from './GrievanceModal.svelte';
+  import GrievanceModal from '../GrievanceModal.svelte';
 
-  const { grievances } = $props();
   let selectedGrievance = $state(null);
   let localGrievances = $state(store.grievances);
 

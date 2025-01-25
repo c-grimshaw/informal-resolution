@@ -2,12 +2,12 @@
   import { store } from '../lib/stores/store.svelte';
   import { auth } from '../lib/stores/authStore.svelte';
   import { get } from '../lib/api/client';
-  import KanbanBoard from '../components/KanbanBoard.svelte';
+  import KanbanBoard from '../components/kanban/KanbanBoard.svelte';
   import GrievanceTable from '../components/GrievanceTable.svelte';
   import ViewToggle from '../components/ViewToggle.svelte';
-  import StatusChart from '../components/StatusChart.svelte';
-  import TrendsChart from '../components/TrendsChart.svelte';
-  import UnitDistributionChart from '../components/UnitDistributionChart.svelte';
+  import StatusChart from '../components/charts/StatusChart.svelte';
+  import TrendsChart from '../components/charts/TrendsChart.svelte';
+  import UnitDistributionChart from '../components/charts/UnitDistributionChart.svelte';
   import { ChevronDown } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import { onMount } from 'svelte';
@@ -89,7 +89,7 @@
     </div>
     <div class="content">
       {#if view === 'kanban'}
-        <KanbanBoard grievances={store.grievances} />
+        <KanbanBoard />
       {:else}
         <GrievanceTable 
           grievances={store.grievances}
