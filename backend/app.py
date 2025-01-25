@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from database import create_db_and_tables
 from routes.auth import auth_router, users_router
 from contextlib import asynccontextmanager
@@ -52,25 +52,24 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Simplified CORS configuration
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # In production, replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
+# Mount API routes
 app.include_router(auth_router, prefix="/auth")
 app.include_router(users_router, prefix="/users")
 app.include_router(grievances.router)
 
-# Mount frontend static files
-frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+# Mount static files
+app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
-# Serve index.html for all unmatched routes (SPA fallback)
 @app.get("/{full_path:path}")
 async def serve_spa(full_path: str):
-    return FileResponse(os.path.join(frontend_path, "index.html"))
+    """Serve the SPA's index.html for any path not matched by the API routes or static files."""
+    return FileResponse("static/index.html")
