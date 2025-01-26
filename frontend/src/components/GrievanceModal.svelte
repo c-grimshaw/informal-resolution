@@ -13,7 +13,7 @@
   import GrievanceNotes from './GrievanceNotes.svelte';
   import { store } from '../lib/stores/store.svelte';
   import { get } from '../lib/api/client';
-  import { slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   
   let { grievance = null, isOpen = false, closeModal = $bindable() } = $props();
   let notes = $state([]);
@@ -67,7 +67,7 @@
   >
     <div class="modal-content" 
       onclick={(e) => e.stopPropagation()}
-      transition:slide
+      transition:fade={{duration: 100}}
     >
       <button class="close-button" onclick={handleCloseClick}>
         <X size={24} />

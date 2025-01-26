@@ -41,8 +41,26 @@
   {#if auth.isSupervisor || auth.isAdmin}
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>Total Grievances</h3>
-        <p class="stat-number">{store.grievances.length}</p>
+        <h3>Total Grievances This Month</h3>
+        {#if store.grievances.length > 0}
+          {@const now = new Date()}
+          {@const thisMonth = store.grievances.filter(g => {
+            const date = new Date(g.created_at);
+            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+          })}
+          {@const lastMonth = store.grievances.filter(g => {
+            const date = new Date(g.created_at);
+            const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1);
+            return date.getMonth() === lastMonthDate.getMonth() && date.getFullYear() === lastMonthDate.getFullYear();
+          })}
+          {@const percentChange = lastMonth.length ? ((thisMonth.length - lastMonth.length) / lastMonth.length) * 100 : 0}
+          <p class="stat-number">{thisMonth.length}</p>
+          {#if lastMonth.length > 0}
+            <p class="stat-change" class:increase={percentChange > 0} class:decrease={percentChange < 0}>
+              {percentChange > 0 ? '↑' : '↓'} {Math.abs(percentChange).toFixed(1)}% from last month
+            </p>
+          {/if}
+        {/if}
       </div>
       <div class="stat-card">
         <h3>Resolved</h3>
@@ -55,10 +73,6 @@
         <p class="stat-number">
           {store.grievances.filter(g => g.status === 'pending').length}
         </p>
-      </div>
-      <div class="stat-card">
-        <h3>Stakeholders</h3>
-        <p class="stat-number">{store.stakeholders.length}</p>
       </div>
     </div>
 
@@ -126,34 +140,38 @@
 
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     width: 100%;
   }
 
   .stat-card {
     background: var(--primary-dark, #1A1A1A);
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    border: 1px solid var(--gray-medium, #666666);
+    border-radius: 4px;
+    padding: 0.75rem;
   }
 
   .stat-card h3 {
-    font-size: 0.9rem;
-    font-weight: 400;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0;
     color: var(--text-light, #FFFFFF);
-    margin: 0 0 1rem 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    opacity: 0.9;
   }
 
   .stat-number {
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--primary-red, #C41E3A);
-    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0.5rem 0 0 0;
+    color: var(--text-light, #FFFFFF);
+  }
+
+  .stat-change {
+    font-size: 0.8em;
+    margin-top: 0.25rem;
+    opacity: 0.9;
   }
 
   .charts-section {
@@ -251,5 +269,18 @@
       gap: 10px;
       padding: 0;
     }
+  }
+
+  .stat-change {
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+  }
+
+  .stat-change.increase {
+    color: #ff4444;
+  }
+
+  .stat-change.decrease {
+    color: #4caf50;
   }
 </style> 

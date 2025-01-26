@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI 
 from database import create_db_and_tables
 from routes.auth import auth_router, users_router
 from contextlib import asynccontextmanager
@@ -9,7 +9,6 @@ from database import get_async_session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-import os
 from routes import grievances
 
 @asynccontextmanager
@@ -32,7 +31,7 @@ async def lifespan(app: FastAPI):
         
         await user_manager.create(
             UserCreate(
-                email="admin@example.com",
+                email="admin@jsis.com",
                 password="123",
                 role="admin",
                 is_superuser=True,
@@ -55,7 +54,7 @@ app = FastAPI(lifespan=lifespan)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

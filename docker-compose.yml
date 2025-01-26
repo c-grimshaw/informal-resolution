@@ -8,6 +8,6 @@ services:
     volumes:
       - ./backend:/app/backend
     environment:
-      - DATABASE_URL=sqlite:///app/test.db
+      - DATABASE_URL=sqlite+aiosqlite:///./test.db
       - SECRET_KEY=your-secret-key-here
       - ENVIRONMENT=production 

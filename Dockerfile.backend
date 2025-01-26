@@ -34,11 +34,11 @@ RUN apt-get update \
 # Copy backend source code
 COPY backend/ .
 
-# Create static directory and copy frontend build artifacts
+# Copy only the frontend build artifacts
 COPY --from=frontend-builder /app/dist/ ./static/
 
 # Expose port 8000
 EXPOSE 8000
 
-# Start the FastAPI server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Run populate script and start server
+CMD sh -c "python scripts/populate_test_data.py && exec uvicorn app:app --host 0.0.0.0 --port 8000" 

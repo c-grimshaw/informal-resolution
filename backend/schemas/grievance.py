@@ -1,6 +1,5 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime
-import uuid
 from typing import Optional, List
 from models.grievance import GrievanceStatus
 

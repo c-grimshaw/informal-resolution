@@ -22,10 +22,12 @@
     
     try {
         store.setLoading(true);
-        const [grievancesData, userData] = await Promise.all([
+        const [stakeholdersData, grievancesData, userData] = await Promise.all([
+            get('/stakeholders'),
             get('/grievances'),
             get('/users/me')
         ]);
+        store.setStakeholders(stakeholdersData);
         store.setGrievances(grievancesData);
         auth.setUser(userData);
     } catch (e) {
