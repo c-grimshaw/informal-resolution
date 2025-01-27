@@ -7,7 +7,7 @@ export async function login(email, password) {
         formData.append('username', email);
         formData.append('password', password);
 
-        const response = await fetch('http://127.0.0.1:8000/auth/jwt/login', {
+        const response = await fetch('/auth/jwt/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -24,7 +24,7 @@ export async function login(email, password) {
         auth.setToken(data.access_token);
         
         // Fetch user data after successful login
-        const userResponse = await fetch('http://127.0.0.1:8000/users/me', {
+        const userResponse = await fetch('/users/me', {
             headers: {
                 'Authorization': `Bearer ${data.access_token}`
             }

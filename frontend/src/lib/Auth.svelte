@@ -1,13 +1,13 @@
 <script>
-    import { auth } from '../lib/stores/authStore.svelte';
-    import { login, register, logout } from '../lib/api/auth';
-    import { store } from '../lib/stores/store.svelte';
-    import { scale } from 'svelte/transition';
-    import UserProfileModal from './UserProfileModal.svelte';
+    import { auth } from "$lib/stores/authStore.svelte";
+    import { login, register, logout } from "$lib/api/auth";
+    import { store } from "$lib/stores/store.svelte";
+    import { scale } from "svelte/transition";
+    import UserProfileModal from "$lib/UserProfileModal.svelte";
 
     let showProfileModal = $state(false);
-    let email = $state('');
-    let password = $state('');
+    let email = $state("");
+    let password = $state("");
     let isRegistering = $state(false);
     let loading = $state(false);
     let submitting = $state(false);
@@ -23,32 +23,39 @@
             } else {
                 await login(email, password);
             }
-            email = '';
-            password = '';
+            email = "";
+            password = "";
         } catch (e) {
             store.setError(e.message);
         } finally {
             loading = false;
             submitting = false;
+            store.setLoading(false);
         }
     }
 
     async function handleLogout() {
         // Clear any form states from localStorage
-        localStorage.removeItem('grievanceFormState');
-        localStorage.removeItem('grievanceFormStep');
-        logout();
+        localStorage.removeItem("grievanceFormState");
+        localStorage.removeItem("grievanceFormStep");
+        await logout();
+        window.location.href = '/';
     }
 </script>
 
 <div class="auth-container">
-    {#if auth.isAuthenticated}
+    {#if auth.loading}
+        <div class="loading">Loading...</div>
+    {:else if auth.isAuthenticated}
         <div class="user-info">
-            <button class="user-button" onclick={() => showProfileModal = true}>
-                <span in:scale={{duration: 150, start: 0.95}}>
-                    {auth.user?.email || 'User'}
+            <button
+                class="user-button"
+                onclick={() => (showProfileModal = true)}
+            >
+                <span in:scale={{ duration: 150, start: 0.95 }}>
+                    {auth.user?.email || "User"}
                 </span>
-                {#if auth.user?.role && auth.user.role !== 'user'}
+                {#if auth.user?.role && auth.user.role !== "user"}
                     <span class="role-badge {auth.user.role}">
                         {auth.user.role}
                     </span>
@@ -75,15 +82,23 @@
                 />
             </div>
             <div class="form-actions">
-                <button type="submit" class="submit-button" disabled={submitting}>
-                    {submitting ? 'Loading...' : isRegistering ? 'Register' : 'Login'}
+                <button
+                    type="submit"
+                    class="submit-button"
+                    disabled={submitting}
+                >
+                    {submitting
+                        ? "Loading..."
+                        : isRegistering
+                          ? "Register"
+                          : "Login"}
                 </button>
                 <button
                     type="button"
                     class="switch-btn"
                     onclick={() => (isRegistering = !isRegistering)}
                 >
-                    {isRegistering ? 'Switch to Login' : 'Switch to Register'}
+                    {isRegistering ? "Switch to Login" : "Switch to Register"}
                 </button>
             </div>
         </form>
@@ -92,10 +107,10 @@
 
 <UserProfileModal
     isOpen={showProfileModal}
-    closeModal={() => showProfileModal = false}
+    closeModal={() => (showProfileModal = false)}
     onProfileUpdate={async () => {
         // Dispatch a custom event that can be listened to by parent components
-        const event = new CustomEvent('profileUpdate');
+        const event = new CustomEvent("profileUpdate");
         window.dispatchEvent(event);
     }}
 />
@@ -119,7 +134,7 @@
     .user-button {
         background: none;
         border: none;
-        color: var(--text-light, #FFFFFF);
+        color: var(--text-light, #ffffff);
         padding: 0.5rem;
         font-size: 0.9rem;
         cursor: pointer;
@@ -141,11 +156,11 @@
     }
 
     .user-button:hover {
-        color: #C8102E;
+        color: #c8102e;
     }
 
     .user-button::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -162,9 +177,9 @@
     }
 
     .logout-button {
-        background: var(--primary-dark, #1A1A1A);
+        background: var(--primary-dark, #1a1a1a);
         border: 1px solid var(--gray-medium, #666666);
-        color: var(--text-light, #FFFFFF);
+        color: var(--text-light, #ffffff);
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
         border-radius: 4px;
@@ -181,7 +196,7 @@
     .login-form {
         display: flex;
         align-items: center;
-        background: var(--primary-dark, #1A1A1A);
+        background: var(--primary-dark, #1a1a1a);
         padding: 0.5rem;
         border-radius: 4px;
         gap: 0.5rem;
@@ -202,13 +217,13 @@
         border-radius: 4px;
         background: var(--gray-dark, #333333);
         border: 1px solid var(--gray-medium, #666666);
-        color: var(--text-light, #FFFFFF);
+        color: var(--text-light, #ffffff);
         transition: all 0.2s ease;
     }
 
     .form-group input:focus {
         outline: none;
-        border-color: #C8102E;
+        border-color: #c8102e;
         box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
     }
 
@@ -222,9 +237,9 @@
     }
 
     .submit-button {
-        background: #C8102E;
+        background: #c8102e;
         border: none;
-        color: var(--text-light, #FFFFFF);
+        color: var(--text-light, #ffffff);
         padding: 0.5rem 1rem;
         font-weight: 500;
         min-width: 80px;
@@ -232,7 +247,7 @@
     }
 
     .submit-button:hover {
-        background: #E31837;
+        background: #e31837;
         transform: translateY(-1px);
     }
 
@@ -271,27 +286,27 @@
 
     .role-badge.admin {
         background: rgba(244, 67, 54, 0.2);
-        color: #F44336;
-        border: 1px solid #F44336;
+        color: #f44336;
+        border: 1px solid #f44336;
     }
 
     .role-badge.supervisor {
         background: rgba(33, 150, 243, 0.2);
-        color: #2196F3;
-        border: 1px solid #2196F3;
+        color: #2196f3;
+        border: 1px solid #2196f3;
     }
 
     .role-badge.user {
         background: rgba(76, 175, 80, 0.2);
-        color: #4CAF50;
-        border: 1px solid #4CAF50;
+        color: #4caf50;
+        border: 1px solid #4caf50;
     }
 
     /* Mobile breakpoint */
     @media (max-width: 768px) {
         .auth-container {
             padding: 0.5rem;
-            background: var(--primary-dark, #1A1A1A);
+            background: var(--primary-dark, #1a1a1a);
             border-radius: 4px;
         }
 
@@ -361,4 +376,12 @@
             width: 100%;
         }
     }
-</style> 
+
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5rem;
+        color: #e0e0e0;
+    }
+</style>

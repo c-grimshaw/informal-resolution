@@ -1,7 +1,5 @@
 import { auth } from '../stores/authStore.svelte';
 
-const BASE_URL = 'http://127.0.0.1:8000';
-
 async function handleResponse(response) {
     if (!response.ok) {
         let errorMessage;
@@ -36,7 +34,7 @@ async function request(endpoint, options = {}) {
         body: options.body ? JSON.stringify(options.body) : undefined
     };
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, config);
+    const response = await fetch(endpoint, config);
     return handleResponse(response);
 }
 

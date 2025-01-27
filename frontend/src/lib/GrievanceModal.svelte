@@ -1,20 +1,20 @@
 <script>
-  import { 
-    User, 
-    Building2, 
+  import {
+    User,
+    Building2,
     Phone,
     Mail,
     Medal,
     Briefcase,
     X,
     Hash,
-  } from 'lucide-svelte';
-  import TypeBadges from './TypeBadges.svelte';
-  import GrievanceNotes from './GrievanceNotes.svelte';
-  import { store } from '../lib/stores/store.svelte';
-  import { get } from '../lib/api/client';
-  import { fade } from 'svelte/transition';
-  
+  } from "lucide-svelte";
+  import TypeBadges from "$lib/TypeBadges.svelte";
+  import GrievanceNotes from "$lib/GrievanceNotes.svelte";
+  import { store } from "$lib/stores/store.svelte";
+  import { get } from "$lib/api/client";
+  import { fade } from "svelte/transition";
+
   let { grievance = null, isOpen = false, closeModal = $bindable() } = $props();
   let notes = $state([]);
 
@@ -24,19 +24,19 @@
       const response = await get(`/grievances/${grievance.id}/notes`);
       notes = response;
     } catch (error) {
-      store.setError('Failed to load notes: ' + error.message);
+      store.setError("Failed to load notes: " + error.message);
     }
   }
 
   function formatDate(dateString) {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-CA', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Intl.DateTimeFormat("en-CA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   }
 
@@ -55,19 +55,20 @@
   function handleCloseClick() {
     closeModal();
   }
-
 </script>
 
 {#if isOpen}
-  <div class="modal-backdrop" 
+  <div
+    class="modal-backdrop"
     role="dialog"
     aria-modal="true"
     onclick={handleBackdropClick}
-    onkeydown={(e) => e.key === 'Escape' && closeModal()}
+    onkeydown={(e) => e.key === "Escape" && closeModal()}
   >
-    <div class="modal-content" 
+    <div
+      class="modal-content"
       onclick={(e) => e.stopPropagation()}
-      transition:fade={{duration: 100}}
+      transition:fade={{ duration: 100 }}
     >
       <button class="close-button" onclick={handleCloseClick}>
         <X size={24} />
@@ -125,8 +126,8 @@
         <div class="info-section">
           <h3>Grievance Information</h3>
           <div class="grievance-type">
-            <TypeBadges 
-              type={grievance.grievance_type} 
+            <TypeBadges
+              type={grievance.grievance_type}
               subtype={grievance.grievance_subtype}
             />
           </div>
@@ -136,7 +137,7 @@
           </div>
           <div class="redress">
             <h4>Redress Requested</h4>
-            <p>{grievance.redress_sought || 'No redress specified'}</p>
+            <p>{grievance.redress_sought || "No redress specified"}</p>
           </div>
         </div>
 
@@ -197,7 +198,7 @@
     right: 1rem;
     background: none;
     border: none;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     cursor: pointer;
     padding: 4px;
     border-radius: 50%;
@@ -221,13 +222,13 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .submission-date {
     margin-top: 0.5rem;
     font-size: 0.9rem;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     opacity: 0.7;
   }
 
@@ -244,7 +245,7 @@
     margin: 0 0 1rem 0;
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .info-grid {
@@ -257,11 +258,11 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .info-item :global(svg) {
-    color: #C8102E;
+    color: #c8102e;
   }
 
   .label {
@@ -277,31 +278,34 @@
     margin: 0 0 0.75rem 0;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .description p {
     margin: 0;
     line-height: 1.6;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     opacity: 0.9;
   }
 
-  .description, .redress {
+  .description,
+  .redress {
     margin-bottom: 1.5rem;
   }
 
-  .description h4, .redress h4 {
+  .description h4,
+  .redress h4 {
     margin: 0 0 0.75rem 0;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
-  .description p, .redress p {
+  .description p,
+  .redress p {
     margin: 0;
     line-height: 1.6;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     opacity: 0.9;
     white-space: pre-line;
   }
@@ -322,8 +326,10 @@
       grid-template-columns: 1fr;
     }
 
-    .modal-header, .modal-body {
+    .modal-header,
+    .modal-body {
       padding: 1rem;
     }
   }
-</style> 
+</style>
+

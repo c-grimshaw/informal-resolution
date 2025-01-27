@@ -1,13 +1,24 @@
 services:
-  app:
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app/backend
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///./test.db
-      - SECRET_KEY=your-secret-key-here
-      - ENVIRONMENT=production 
+      - DATABASE_URL=sqlite+aiosqlite:////app/test.db
+    volumes:
+      - ./backend:/app
+      - ./frontend/build:/app/static
+    working_dir: /app
+    user: root
+    command: >
+      sh -c "touch /app/test.db &&
+             chown nobody:nogroup /app/test.db &&
+             chmod 666 /app/test.db &&
+             mkdir -p /app/static/_app &&
+             python scripts/populate_test_data.py &&
+             uvicorn app:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  frontend_static:

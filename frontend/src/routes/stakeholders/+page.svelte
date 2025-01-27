@@ -1,9 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
-  import { get } from '../lib/api/client';
-  import { store } from '../lib/stores/store.svelte';
-  import StakeholdersTable from '../components/StakeholdersTable.svelte';
-
+  import { onMount } from "svelte";
+  import { get } from "$lib/api/client";
+  import { store } from "$lib/stores/store.svelte";
+  import StakeholdersTable from "$lib/StakeholdersTable.svelte";
 
   onMount(async () => {
     await fetchStakeholders();
@@ -12,11 +11,11 @@
   async function fetchStakeholders() {
     try {
       store.setLoading(true);
-      const response = await get('/users/all');
+      const response = await get("/users/all");
       console.log(response);
       store.setStakeholders(response);
     } catch (error) {
-      store.setError('Failed to fetch stakeholders');
+      store.setError("Failed to fetch stakeholders");
     } finally {
       store.setLoading(false);
     }
@@ -28,9 +27,7 @@
     <h1>Stakeholders</h1>
   </header>
 
-  <StakeholdersTable 
-    stakeholders={store.stakeholders}
-  />
+  <StakeholdersTable stakeholders={store.stakeholders} />
 </div>
 
 <style>
@@ -47,7 +44,7 @@
   h1 {
     font-size: 1.5rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     margin: 0;
   }
-</style> 
+</style>

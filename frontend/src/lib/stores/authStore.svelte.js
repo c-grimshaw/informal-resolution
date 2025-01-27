@@ -26,6 +26,9 @@ function createAuthStore() {
             } else {
                 localStorage.removeItem('token');
                 state.isAuthenticated = false;
+                state.user = null;
+                state.isAdmin = false;
+                state.isSupervisor = false;
             }
         },
 
@@ -34,7 +37,6 @@ function createAuthStore() {
             if (userData) {
                 state.isAdmin = userData.is_superuser || userData.role === 'admin';
                 state.isSupervisor = userData.is_superuser || userData.role === 'admin' || userData.role === 'supervisor';
-                // Navigate to Help view on login
                 state.currentRoute = 'help';
             } else {
                 state.isAdmin = false;
@@ -46,11 +48,36 @@ function createAuthStore() {
             state.loading = value;
         },
 
-        initialize() {
+        async loadUser(customFetch = fetch) {
+            state.loading = true;
+            try {
+                const response = await customFetch('/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`
+                    }
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    this.setUser(userData);
+                } else {
+                    this.setToken(null);
+                }
+            } catch (error) {
+                console.error('Failed to load user:', error);
+                this.setToken(null);
+            } finally {
+                state.loading = false;
+            }
+        },
+
+        async initialize(customFetch = fetch) {
+            state.loading = true;
             const savedToken = localStorage.getItem('token');
             if (savedToken) {
                 this.setToken(savedToken);
+                await this.loadUser(customFetch);
             }
+            state.loading = false;
         },
 
         logout() {

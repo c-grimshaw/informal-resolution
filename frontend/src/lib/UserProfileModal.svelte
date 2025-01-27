@@ -1,42 +1,38 @@
 <script>
-  import { 
-    User, 
-    Building2, 
-    Phone,
-    Mail,
-    Medal,
-    Hash,
-    X
-  } from 'lucide-svelte';
-  import { auth } from '../lib/stores/authStore.svelte';
-  import { store } from '../lib/stores/store.svelte';
-  import { patch } from '../lib/api/client';
-  import { ranks, units } from '../lib/constants';
+  import { User, Building2, Phone, Mail, Medal, Hash, X } from "lucide-svelte";
+  import { auth } from "$lib/stores/authStore.svelte";
+  import { store } from "$lib/stores/store.svelte";
+  import { patch } from "$lib/api/client";
+  import { ranks, units } from "$lib/constants";
 
-  let { isOpen = false, closeModal = $bindable(), onProfileUpdate = $bindable() } = $props();
-  
+  let {
+    isOpen = false,
+    closeModal = $bindable(),
+    onProfileUpdate = $bindable(),
+  } = $props();
+
   let submitting = $state(false);
   let formData = $state({
-    name: auth.user?.name || '',
-    service_number: auth.user?.service_number || '',
-    rank: auth.user?.rank || '',
-    email: auth.user?.email || '',
-    phone: auth.user?.phone || '',
-    unit: auth.user?.unit || '',
-    position: auth.user?.position || ''
+    name: auth.user?.name || "",
+    service_number: auth.user?.service_number || "",
+    rank: auth.user?.rank || "",
+    email: auth.user?.email || "",
+    phone: auth.user?.phone || "",
+    unit: auth.user?.unit || "",
+    position: auth.user?.position || "",
   });
 
   // Update formData when auth.user changes
   $effect(() => {
     if (auth.user) {
       formData = {
-        name: auth.user.name || '',
-        service_number: auth.user.service_number || '',
-        rank: auth.user.rank || '',
-        email: auth.user.email || '',
-        phone: auth.user.phone || '',
-        unit: auth.user.unit || '',
-        position: auth.user.position || ''
+        name: auth.user.name || "",
+        service_number: auth.user.service_number || "",
+        rank: auth.user.rank || "",
+        email: auth.user.email || "",
+        phone: auth.user.phone || "",
+        unit: auth.user.unit || "",
+        position: auth.user.position || "",
       };
     }
   });
@@ -44,18 +40,18 @@
   async function handleSubmit(e) {
     e.preventDefault();
     submitting = true;
-    
+
     try {
       // Remove email from the update payload since it can't be changed
       const { email, ...updateData } = formData;
-      
+
       const response = await patch(`/users/me`, updateData);
       auth.setUser(response);
-      store.setError('✓ Profile updated successfully');
+      store.setError("✓ Profile updated successfully");
       if (onProfileUpdate) onProfileUpdate();
       closeModal();
     } catch (error) {
-      store.setError('Failed to update profile: ' + error.message);
+      store.setError("Failed to update profile: " + error.message);
     } finally {
       submitting = false;
     }
@@ -69,15 +65,14 @@
 </script>
 
 {#if isOpen}
-  <div class="modal-backdrop" 
+  <div
+    class="modal-backdrop"
     role="button"
     tabindex="0"
     onclick={handleBackdropClick}
-    onkeydown={(e) => e.key === 'Escape' && closeModal()}
+    onkeydown={(e) => e.key === "Escape" && closeModal()}
   >
-    <div class="modal-content" 
-      onclick={(e) => e.stopPropagation()}
-    >
+    <div class="modal-content" onclick={(e) => e.stopPropagation()}>
       <button class="close-button" onclick={closeModal}>
         <X size={24} />
       </button>
@@ -92,8 +87,10 @@
             <User size={16} />
             Full Name
           </label>
-          <div class="field-description">Your legal full name as it appears in official documents</div>
-          <input type="text" id="name" bind:value={formData.name} required>
+          <div class="field-description">
+            Your legal full name as it appears in official documents
+          </div>
+          <input type="text" id="name" bind:value={formData.name} required />
         </div>
 
         <div class="form-group">
@@ -102,7 +99,12 @@
             Service Number
           </label>
           <div class="field-description">Your military service number</div>
-          <input type="text" id="service_number" bind:value={formData.service_number} required>
+          <input
+            type="text"
+            id="service_number"
+            bind:value={formData.service_number}
+            required
+          />
         </div>
 
         <div class="form-group">
@@ -124,14 +126,16 @@
             <Mail size={16} />
             Email
           </label>
-          <div class="field-description">Your JSIS email address (cannot be changed)</div>
-          <input 
-            type="email" 
-            id="email" 
-            value={formData.email} 
-            readonly 
+          <div class="field-description">
+            Your JSIS email address (cannot be changed)
+          </div>
+          <input
+            type="email"
+            id="email"
+            value={formData.email}
+            readonly
             class="readonly"
-          >
+          />
         </div>
 
         <div class="form-group">
@@ -139,8 +143,10 @@
             <Phone size={16} />
             Phone
           </label>
-          <div class="field-description">Include area code and any extension if applicable</div>
-          <input type="tel" id="phone" bind:value={formData.phone} required>
+          <div class="field-description">
+            Include area code and any extension if applicable
+          </div>
+          <input type="tel" id="phone" bind:value={formData.phone} required />
         </div>
 
         <div class="form-group">
@@ -162,13 +168,20 @@
             <User size={16} />
             Position
           </label>
-          <div class="field-description">Your current position or role within the unit</div>
-          <input type="text" id="position" bind:value={formData.position} required>
+          <div class="field-description">
+            Your current position or role within the unit
+          </div>
+          <input
+            type="text"
+            id="position"
+            bind:value={formData.position}
+            required
+          />
         </div>
 
         <div class="button-group">
           <button type="submit" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Save Changes'}
+            {submitting ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>
@@ -210,7 +223,7 @@
   }
 
   .modal-content {
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     border: 1px solid var(--gray-medium, #666666);
     border-radius: 8px;
     width: 90%;
@@ -233,7 +246,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .modal-body {
@@ -249,7 +262,7 @@
     right: 0.75rem;
     background: none;
     border: none;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 4px;
@@ -273,7 +286,7 @@
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     font-weight: 500;
     font-size: 0.875rem;
   }
@@ -284,20 +297,22 @@
     margin-bottom: 0.125rem;
   }
 
-  input, select {
+  input,
+  select {
     padding: 0.5rem;
     border-radius: 4px;
     border: 1px solid var(--gray-medium, #666666);
     background: var(--gray-dark, #333333);
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     font-size: 0.875rem;
     width: 100%;
     transition: all 0.2s;
   }
 
-  input:focus, select:focus {
+  input:focus,
+  select:focus {
     outline: none;
-    border-color: #C8102E;
+    border-color: #c8102e;
     box-shadow: 0 0 0 1px rgba(200, 16, 46, 0.2);
   }
 
@@ -318,7 +333,7 @@
   }
 
   button[type="submit"] {
-    background: #C8102E;
+    background: #c8102e;
     color: white;
     border: none;
     padding: 0.5rem 1rem;
@@ -330,7 +345,7 @@
   }
 
   button[type="submit"]:hover {
-    background: #E31837;
+    background: #e31837;
     transform: translateY(-1px);
   }
 
@@ -353,3 +368,4 @@
     box-shadow: none;
   }
 </style>
+

@@ -1,12 +1,12 @@
 <script>
-  import { ChevronDown, ChevronUp } from 'lucide-svelte';
-  import { store } from '../lib/stores/store.svelte';
-  import { get, post } from '../lib/api/client';
+  import { ChevronDown, ChevronUp } from "lucide-svelte";
+  import { store } from "$lib/stores/store.svelte";
+  import { get, post } from "$lib/api/client";
 
   let { grievanceId } = $props();
   let isExpanded = $state(true);
   let notes = $state([]);
-  let newNote = $state('');
+  let newNote = $state("");
   let submitting = $state(false);
 
   async function loadNotes() {
@@ -15,37 +15,37 @@
       const response = await get(`/grievances/${grievanceId}/notes`);
       notes = response;
     } catch (error) {
-      store.setError('Failed to load notes: ' + error.message);
+      store.setError("Failed to load notes: " + error.message);
     }
   }
 
   async function addNote() {
     if (!newNote.trim()) return;
-    
+
     try {
       submitting = true;
       const response = await post(`/grievances/${grievanceId}/notes`, {
-        content: newNote.trim()
+        content: newNote.trim(),
       });
       notes = [response, ...notes];
-      newNote = '';
+      newNote = "";
       isExpanded = true;
     } catch (error) {
-      store.setError('Failed to add note: ' + error.message);
+      store.setError("Failed to add note: " + error.message);
     } finally {
       submitting = false;
     }
   }
 
   function formatDate(dateString) {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-CA', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Intl.DateTimeFormat("en-CA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   }
 
@@ -57,10 +57,10 @@
 </script>
 
 <div class="notes-section">
-  <button 
-    class="section-header" 
-    onclick={() => isExpanded = !isExpanded}
-    onkeydown={(e) => e.key === 'Enter' && (isExpanded = !isExpanded)}
+  <button
+    class="section-header"
+    onclick={() => (isExpanded = !isExpanded)}
+    onkeydown={(e) => e.key === "Enter" && (isExpanded = !isExpanded)}
   >
     <h3>Notes</h3>
     {#if isExpanded}
@@ -69,10 +69,16 @@
       <ChevronDown size={20} />
     {/if}
   </button>
-  
+
   {#if isExpanded}
     <div class="notes-content">
-      <form onsubmit={e => { e.preventDefault(); addNote(); }} class="note-form">
+      <form
+        onsubmit={(e) => {
+          e.preventDefault();
+          addNote();
+        }}
+        class="note-form"
+      >
         <textarea
           bind:value={newNote}
           placeholder="Add a note or update..."
@@ -97,9 +103,7 @@
           </div>
         {/each}
         {#if notes.length === 0}
-          <div class="no-notes">
-            No notes have been added yet.
-          </div>
+          <div class="no-notes">No notes have been added yet.</div>
         {/if}
       </div>
     </div>
@@ -120,7 +124,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.25rem;
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     cursor: pointer;
     user-select: none;
     border-radius: 8px 8px 0 0;
@@ -139,7 +143,7 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   .notes-content {
@@ -155,8 +159,8 @@
     padding: 1rem;
     border: 1px solid var(--gray-medium, #666666);
     border-radius: 8px;
-    background: var(--primary-dark, #1A1A1A);
-    color: var(--text-light, #FFFFFF);
+    background: var(--primary-dark, #1a1a1a);
+    color: var(--text-light, #ffffff);
     resize: vertical;
     margin-bottom: 0.75rem;
     font-family: inherit;
@@ -166,13 +170,13 @@
 
   .note-form textarea:focus {
     outline: none;
-    border-color: var(--primary-red, #C41E3A);
+    border-color: var(--primary-red, #c41e3a);
     box-shadow: 0 0 0 2px rgba(196, 30, 58, 0.2);
   }
 
   .note-form button {
     padding: 0.75rem 1.5rem;
-    background: var(--primary-red, #C41E3A);
+    background: var(--primary-red, #c41e3a);
     color: white;
     border: none;
     border-radius: 6px;
@@ -182,7 +186,7 @@
   }
 
   .note-form button:hover:not(:disabled) {
-    background: #A01830;
+    background: #a01830;
     transform: translateY(-1px);
   }
 
@@ -198,7 +202,7 @@
   }
 
   .note {
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     border: 1px solid var(--gray-medium, #666666);
     border-radius: 8px;
     padding: 1.25rem;
@@ -220,7 +224,7 @@
 
   .note-author {
     font-weight: 500;
-    color: var(--primary-red, #C41E3A);
+    color: var(--primary-red, #c41e3a);
   }
 
   .note-date {
@@ -229,7 +233,7 @@
 
   .note-content {
     white-space: pre-wrap;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     line-height: 1.6;
     font-size: 0.95rem;
   }
@@ -239,7 +243,7 @@
     padding: 2rem;
     color: var(--gray-light, #999999);
     font-style: italic;
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     border-radius: 8px;
     border: 1px dashed var(--gray-medium, #666666);
   }
@@ -257,4 +261,5 @@
       padding: 1rem;
     }
   }
-</style> 
+</style>
+

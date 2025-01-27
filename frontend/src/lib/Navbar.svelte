@@ -1,75 +1,63 @@
 <script>
-    import { auth } from '../lib/stores/authStore.svelte';
-    import { store } from '../lib/stores/store.svelte';
-    import { 
-        Home as HomeIcon, 
-        FileText, 
-        Users, 
+    import { auth } from "$lib/stores/authStore.svelte";
+    import { store } from "$lib/stores/store.svelte";
+    import {
+        Home as HomeIcon,
+        FileText,
+        Users,
         Settings,
-        HelpCircle 
-    } from 'lucide-svelte';
-    import Auth from './Auth.svelte';
-
-    let {currentRoute = $bindable()} = $props();
-
-    function handleNavigation(route) {
-        currentRoute = route;
-        store.clearError();
-    }
+        HelpCircle,
+    } from "lucide-svelte";
+    import Auth from "./Auth.svelte";
 </script>
 
 <nav>
     <div class="nav-content">
         <ul class="nav-links">
             <li>
-                <button 
-                    class:active={currentRoute === 'home'} 
-                    onclick={() => handleNavigation('home')}
-                >
-                    <HomeIcon size={16} />
-                    <span>Home</span>
-                </button>
+                <a href="/home">
+                    <button>
+                        <HomeIcon size={16} />
+                        <span>Home</span>
+                    </button>
+                </a>
             </li>
             {#if auth.isAuthenticated}
                 <li>
-                    <button 
-                        class:active={currentRoute === 'grievances'} 
-                        onclick={() => handleNavigation('grievances')}
-                    >
-                        <FileText size={16} />
-                        <span>Grievances</span>
-                    </button>
+                    <a href="/grievance">
+                        <button>
+                            <FileText size={16} />
+                            <span>Grievances</span>
+                        </button>
+                    </a>
                 </li>
                 {#if auth.isAdmin || auth.isSupervisor}
                     <li>
-                        <button 
-                            class:active={currentRoute === 'admin'} 
-                            onclick={() => handleNavigation('admin')}
-                        >
-                            <Settings size={16} />
-                            <span>Manage</span>
-                        </button>
+                        <a href="/manage">
+                            <button>
+                                <Settings size={16} />
+                                <span>Manage</span>
+                            </button>
+                        </a>
                     </li>
                 {/if}
                 {#if auth.isAdmin}
                     <li>
-                        <button 
-                            class:active={currentRoute === 'stakeholders'} 
-                            onclick={() => handleNavigation('stakeholders')}
-                        >
-                            <Users size={16} />
-                            <span>Stakeholders</span>
-                        </button>
+                        <a href="/stakeholders">
+                            <button>
+                                <Users size={16} />
+                                <span>Stakeholders</span>
+                            </button>
+                        </a>
                     </li>
                 {/if}
                 <li>
-                    <button 
-                        class:active={currentRoute === 'help'} 
-                        onclick={() => handleNavigation('help')}
-                    >
-                        <HelpCircle size={16} />
-                        <span>Help</span>
-                    </button>
+                    <a href="/help">
+                        <button>
+                            <HelpCircle size={16} />
+                            <span>Help</span>
+                        </button>
+                    </a>
                 </li>
             {/if}
         </ul>
@@ -127,7 +115,7 @@
     }
 
     .nav-links button::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -139,7 +127,7 @@
     }
 
     .nav-links button:hover {
-        color: #C8102E;
+        color: #c8102e;
     }
 
     .nav-links button:hover::before {
@@ -147,14 +135,14 @@
     }
 
     .nav-links button.active {
-        background: #C8102E;
+        background: #c8102e;
         color: white;
         font-weight: 600;
         box-shadow: 0 2px 4px rgba(200, 16, 46, 0.2);
     }
 
     .nav-links button.active:hover {
-        background: #E31837;
+        background: #e31837;
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(200, 16, 46, 0.3);
     }
@@ -168,7 +156,7 @@
 
     .nav-links button:hover :global(svg) {
         transform: scale(1.1) rotate(5deg);
-        color: #C8102E;
+        color: #c8102e;
     }
 
     .nav-links button.active:hover :global(svg) {
@@ -238,4 +226,4 @@
             width: 100%;
         }
     }
-</style> 
+</style>

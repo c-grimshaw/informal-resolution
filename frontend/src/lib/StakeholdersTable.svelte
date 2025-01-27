@@ -1,107 +1,113 @@
 <script>
-  import { store } from '../lib/stores/store.svelte';
-  import { auth } from '../lib/stores/authStore.svelte';
-  import { patch } from '../lib/api/client';
-  import { 
+  import { store } from "$lib/stores/store.svelte";
+  import { auth } from "$lib/stores/authStore.svelte";
+  import { patch } from "$lib/api/client";
+  import {
     ArrowUp,
     ArrowDown,
-    User, 
+    User,
     Building2,
     Mail,
     Shield,
     Medal,
-    Target
-  } from 'lucide-svelte';
+    Target,
+  } from "lucide-svelte";
 
-  let { 
-    stakeholders = [],
-    showFilters = true
-  } = $props();
+  let { stakeholders = [], showFilters = true } = $props();
 
   const roleOptions = [
-    { value: 'user', label: 'User' },
-    { value: 'supervisor', label: 'Supervisor' },
-    { value: 'admin', label: 'Admin' }
+    { value: "user", label: "User" },
+    { value: "supervisor", label: "Supervisor" },
+    { value: "admin", label: "Admin" },
   ];
 
   // Define all possible columns
   const columns = [
-    { field: 'email', label: 'Email', icon: Mail },
-    { field: 'name', label: 'Name', icon: User },
-    { field: 'rank', label: 'Rank', icon: Medal },
-    { field: 'unit', label: 'Unit', icon: Building2 },
-    { field: 'position', label: 'Position', icon: Target },
-    { field: 'role', label: 'Role', icon: Shield }
+    { field: "email", label: "Email", icon: Mail },
+    { field: "name", label: "Name", icon: User },
+    { field: "rank", label: "Rank", icon: Medal },
+    { field: "unit", label: "Unit", icon: Building2 },
+    { field: "position", label: "Position", icon: Target },
+    { field: "role", label: "Role", icon: Shield },
   ];
 
-  let sortField = $state('email');
-  let sortDirection = $state('asc');
+  let sortField = $state("email");
+  let sortDirection = $state("asc");
   let filters = $state({
-    email: '',
-    name: '',
-    unit: '',
-    role: ''
+    email: "",
+    name: "",
+    unit: "",
+    role: "",
   });
 
   let sortedAndFilteredStakeholders = $derived(
     stakeholders
-      .filter(s => {
-        return (!filters.email || s.email.toLowerCase().includes(filters.email.toLowerCase())) &&
-               (!filters.name || s.name?.toLowerCase().includes(filters.name.toLowerCase())) &&
-               (!filters.unit || s.unit?.toLowerCase().includes(filters.unit.toLowerCase())) &&
-               (!filters.role || s.role?.toLowerCase().includes(filters.role.toLowerCase()));
+      .filter((s) => {
+        return (
+          (!filters.email ||
+            s.email.toLowerCase().includes(filters.email.toLowerCase())) &&
+          (!filters.name ||
+            s.name?.toLowerCase().includes(filters.name.toLowerCase())) &&
+          (!filters.unit ||
+            s.unit?.toLowerCase().includes(filters.unit.toLowerCase())) &&
+          (!filters.role ||
+            s.role?.toLowerCase().includes(filters.role.toLowerCase()))
+        );
       })
       .sort((a, b) => {
-        const direction = sortDirection === 'asc' ? 1 : -1;
-        const aVal = (a[sortField] || '').toLowerCase();
-        const bVal = (b[sortField] || '').toLowerCase();
+        const direction = sortDirection === "asc" ? 1 : -1;
+        const aVal = (a[sortField] || "").toLowerCase();
+        const bVal = (b[sortField] || "").toLowerCase();
         return direction * (aVal < bVal ? -1 : aVal > bVal ? 1 : 0);
-      })
+      }),
   );
 
   function toggleSort(field) {
     if (sortField === field) {
-      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      sortDirection = sortDirection === "asc" ? "desc" : "asc";
     } else {
       sortField = field;
-      sortDirection = 'asc';
+      sortDirection = "asc";
     }
   }
 
   async function handleRoleChange(stakeholder, newRole) {
     try {
       store.setLoading(true);
-      console.log('Attempting role change:', { userId: stakeholder.id, newRole });
-      const response = await patch(`/users/${stakeholder.id}`, {
-        role: newRole
+      console.log("Attempting role change:", {
+        userId: stakeholder.id,
+        newRole,
       });
-      console.log('Role change response:', response);
-      
+      const response = await patch(`/users/${stakeholder.id}`, {
+        role: newRole,
+      });
+      console.log("Role change response:", response);
+
       // Update the stakeholder in the local state
-      stakeholders = stakeholders.map(s => 
-        s.id === stakeholder.id ? { ...s, role: newRole } : s
+      stakeholders = stakeholders.map((s) =>
+        s.id === stakeholder.id ? { ...s, role: newRole } : s,
       );
       // If this is the current user, update the auth store
       if (stakeholder.id === auth.user?.id) {
         auth.setUser({ ...auth.user, role: newRole });
       }
-      store.setError('✓ Role updated successfully');
+      store.setError("✓ Role updated successfully");
     } catch (error) {
-      console.error('Role change error:', error);
-      store.setError('Failed to update role: ' + error.message);
+      console.error("Role change error:", error);
+      store.setError("Failed to update role: " + error.message);
     } finally {
       store.setLoading(false);
     }
   }
 
   function getRoleBadgeClass(role) {
-    switch(role?.toLowerCase()) {
-      case 'admin':
-        return 'role-admin';
-      case 'supervisor':
-        return 'role-supervisor';
+    switch (role?.toLowerCase()) {
+      case "admin":
+        return "role-admin";
+      case "supervisor":
+        return "role-supervisor";
       default:
-        return 'role-user';
+        return "role-user";
     }
   }
 </script>
@@ -111,39 +117,39 @@
     <div class="filters">
       <div class="filter-group">
         <Mail size={16} />
-        <input 
-          type="text" 
-          placeholder="Filter by email..." 
+        <input
+          type="text"
+          placeholder="Filter by email..."
           bind:value={filters.email}
           class="filter-input"
-        >
+        />
       </div>
       <div class="filter-group">
         <User size={16} />
-        <input 
-          type="text" 
-          placeholder="Filter by name..." 
+        <input
+          type="text"
+          placeholder="Filter by name..."
           bind:value={filters.name}
           class="filter-input"
-        >
+        />
       </div>
       <div class="filter-group">
         <Building2 size={16} />
-        <input 
-          type="text" 
-          placeholder="Filter by unit..." 
+        <input
+          type="text"
+          placeholder="Filter by unit..."
           bind:value={filters.unit}
           class="filter-input"
-        >
+        />
       </div>
       <div class="filter-group">
         <Shield size={16} />
-        <input 
-          type="text" 
-          placeholder="Filter by role..." 
+        <input
+          type="text"
+          placeholder="Filter by role..."
           bind:value={filters.role}
           class="filter-input"
-        >
+        />
       </div>
     </div>
   {/if}
@@ -161,7 +167,8 @@
                 {/if}
                 <span>{column.label}</span>
                 {#if sortField === column.field}
-                  {@const SortIcon = sortDirection === 'asc' ? ArrowUp : ArrowDown}
+                  {@const SortIcon =
+                    sortDirection === "asc" ? ArrowUp : ArrowDown}
                   <SortIcon size={16} class="sort-indicator" />
                 {/if}
               </div>
@@ -174,19 +181,26 @@
           <tr>
             {#each columns as column}
               <td>
-                {#if column.field === 'role'}
+                {#if column.field === "role"}
                   {#if auth.isAdmin && stakeholder.id !== auth.user?.id}
-                    <select 
+                    <select
                       value={stakeholder[column.field]}
-                      onchange={(e) => handleRoleChange(stakeholder, e.currentTarget.value)}
-                      class="role-select {getRoleBadgeClass(stakeholder[column.field])}"
+                      onchange={(e) =>
+                        handleRoleChange(stakeholder, e.currentTarget.value)}
+                      class="role-select {getRoleBadgeClass(
+                        stakeholder[column.field],
+                      )}"
                     >
                       {#each roleOptions as option}
                         <option value={option.value}>{option.label}</option>
                       {/each}
                     </select>
                   {:else}
-                    <span class="role-badge {getRoleBadgeClass(stakeholder[column.field])}">
+                    <span
+                      class="role-badge {getRoleBadgeClass(
+                        stakeholder[column.field],
+                      )}"
+                    >
                       {stakeholder[column.field]}
                     </span>
                   {/if}
@@ -219,7 +233,7 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     padding: 1rem;
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     border-bottom: 1px solid var(--gray-medium, #666666);
   }
 
@@ -242,7 +256,7 @@
     padding: 8px 0;
     background: transparent;
     border: none;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     font-size: 0.9em;
   }
 
@@ -259,24 +273,25 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   thead {
     position: sticky;
     top: 0;
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     z-index: 1;
   }
 
-  th, td {
+  th,
+  td {
     padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid var(--gray-medium, #666666);
   }
 
   th {
-    background: var(--primary-dark, #1A1A1A);
+    background: var(--primary-dark, #1a1a1a);
     font-weight: 500;
     text-transform: uppercase;
     font-size: 0.8em;
@@ -301,7 +316,7 @@
   }
 
   .sort-indicator {
-    color: var(--primary-red, #C41E3A);
+    color: var(--primary-red, #c41e3a);
   }
 
   tr:hover {
@@ -320,20 +335,20 @@
 
   .role-admin {
     background: rgba(244, 67, 54, 0.2);
-    color: #F44336;
-    border: 1px solid #F44336;
+    color: #f44336;
+    border: 1px solid #f44336;
   }
 
   .role-supervisor {
     background: rgba(33, 150, 243, 0.2);
-    color: #2196F3;
-    border: 1px solid #2196F3;
+    color: #2196f3;
+    border: 1px solid #2196f3;
   }
 
   .role-user {
     background: rgba(76, 175, 80, 0.2);
-    color: #4CAF50;
-    border: 1px solid #4CAF50;
+    color: #4caf50;
+    border: 1px solid #4caf50;
   }
 
   .delete-cell {
@@ -363,8 +378,8 @@
     width: 140px;
     padding: 6px 12px;
     border-radius: 4px;
-    background: var(--primary-dark, #1A1A1A);
-    color: var(--text-light, #FFFFFF);
+    background: var(--primary-dark, #1a1a1a);
+    color: var(--text-light, #ffffff);
     border: 1px solid var(--gray-medium, #666666);
     cursor: pointer;
     font-size: 0.85em;
@@ -380,57 +395,57 @@
   }
 
   .role-select:hover {
-    border-color: var(--text-light, #FFFFFF);
+    border-color: var(--text-light, #ffffff);
   }
 
   .role-select:focus {
     outline: none;
-    border-color: var(--text-light, #FFFFFF);
+    border-color: var(--text-light, #ffffff);
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
   }
 
   .role-select.role-admin {
-    border-color: #F44336;
-    color: #F44336;
+    border-color: #f44336;
+    color: #f44336;
     background-color: rgba(244, 67, 54, 0.1);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23F44336' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   }
 
   .role-select.role-admin:hover,
   .role-select.role-admin:focus {
-    border-color: #F44336;
+    border-color: #f44336;
     box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
   }
 
   .role-select.role-supervisor {
-    border-color: #2196F3;
-    color: #2196F3;
+    border-color: #2196f3;
+    color: #2196f3;
     background-color: rgba(33, 150, 243, 0.1);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232196F3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   }
 
   .role-select.role-supervisor:hover,
   .role-select.role-supervisor:focus {
-    border-color: #2196F3;
+    border-color: #2196f3;
     box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
   }
 
   .role-select.role-user {
-    border-color: #4CAF50;
-    color: #4CAF50;
+    border-color: #4caf50;
+    color: #4caf50;
     background-color: rgba(76, 175, 80, 0.1);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   }
 
   .role-select.role-user:hover,
   .role-select.role-user:focus {
-    border-color: #4CAF50;
+    border-color: #4caf50;
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
   }
 
   .role-select option {
-    background: var(--primary-dark, #1A1A1A);
-    color: var(--text-light, #FFFFFF);
+    background: var(--primary-dark, #1a1a1a);
+    color: var(--text-light, #ffffff);
     padding: 8px;
   }
 
@@ -439,7 +454,8 @@
       grid-template-columns: 1fr;
     }
 
-    th, td {
+    th,
+    td {
       padding: 8px 12px;
     }
 
@@ -447,4 +463,4 @@
       height: calc(100vh - 200px);
     }
   }
-</style> 
+</style>

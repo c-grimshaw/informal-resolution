@@ -1,21 +1,26 @@
 <script>
-  import { AlertCircle, Timer, CheckCircle2 } from 'lucide-svelte';
+  import { AlertCircle, Timer, CheckCircle2 } from "lucide-svelte";
 </script>
 
 <div class="help-view">
   <section class="about">
     <h1>About the Informal Resolution Module</h1>
     <p>
-      The Informal Resolution Module (IRM) is a digital platform designed to streamline the initial grievance process within Canadian Special Operations Forces Command (CANSOFCOM). 
-      It provides a structured way to track, manage, and resolve concerns at the unit level before they escalate to formal grievances.
+      The Informal Resolution Module (IRM) is a digital platform designed to
+      streamline the initial grievance process within Canadian Special
+      Operations Forces Command (CANSOFCOM). It provides a structured way to
+      track, manage, and resolve concerns at the unit level before they escalate
+      to formal grievances.
     </p>
-    
+
     <div class="disclaimer">
       <AlertCircle size={20} />
       <p>
-        <strong>Important:</strong> This system does not replace the formal grievance process. 
-        While the IRM facilitates early resolution of concerns, members retain their right to submit formal grievances through official military channels.
-        Time spent in informal resolution does not affect formal grievance submission deadlines.
+        <strong>Important:</strong> This system does not replace the formal grievance
+        process. While the IRM facilitates early resolution of concerns, members
+        retain their right to submit formal grievances through official military
+        channels. Time spent in informal resolution does not affect formal grievance
+        submission deadlines.
       </p>
     </div>
   </section>
@@ -28,9 +33,7 @@
           <AlertCircle size={20} />
           <h3>Pending</h3>
         </div>
-        <p>
-          Initial submission awaiting review. During this stage:
-        </p>
+        <p>Initial submission awaiting review. During this stage:</p>
         <ul>
           <li>Chain of command is notified</li>
           <li>Initial assessment is conducted</li>
@@ -43,9 +46,7 @@
           <Timer size={20} />
           <h3>In Progress</h3>
         </div>
-        <p>
-          Active informal resolution phase. Actions include:
-        </p>
+        <p>Active informal resolution phase. Actions include:</p>
         <ul>
           <li>Regular communication between parties</li>
           <li>Documentation of resolution attempts</li>
@@ -58,9 +59,7 @@
           <CheckCircle2 size={20} />
           <h3>Resolved</h3>
         </div>
-        <p>
-          Concern addressed through informal channels. Outcomes include:
-        </p>
+        <p>Concern addressed through informal channels. Outcomes include:</p>
         <ul>
           <li>Agreement on resolution reached</li>
           <li>Documentation of final outcome</li>
@@ -75,23 +74,39 @@
     <ol>
       <li>
         <strong>Initial Submission</strong>
-        <p>Provide detailed information about your concern, including specific incidents, dates, and desired outcome.</p>
+        <p>
+          Provide detailed information about your concern, including specific
+          incidents, dates, and desired outcome.
+        </p>
       </li>
       <li>
         <strong>Review and Assessment</strong>
-        <p>Your chain of command will review the submission and determine the appropriate course of action.</p>
+        <p>
+          Your chain of command will review the submission and determine the
+          appropriate course of action.
+        </p>
       </li>
       <li>
         <strong>Informal Resolution</strong>
-        <p>Work collaboratively with your chain of command to address the concern through discussion, mediation, or other appropriate means.</p>
+        <p>
+          Work collaboratively with your chain of command to address the concern
+          through discussion, mediation, or other appropriate means.
+        </p>
       </li>
       <li>
         <strong>Documentation</strong>
-        <p>All communications and resolution attempts are documented within the system for transparency and record-keeping.</p>
+        <p>
+          All communications and resolution attempts are documented within the
+          system for transparency and record-keeping.
+        </p>
       </li>
       <li>
         <strong>Outcome</strong>
-        <p>If resolved informally, the concern is closed. If unresolved, you may proceed with the formal grievance process while maintaining a complete record of informal resolution attempts.</p>
+        <p>
+          If resolved informally, the concern is closed. If unresolved, you may
+          proceed with the formal grievance process while maintaining a complete
+          record of informal resolution attempts.
+        </p>
       </li>
     </ol>
   </section>
@@ -116,7 +131,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
   }
 
   section {
@@ -126,27 +141,27 @@
   h1 {
     font-size: 1.5rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     margin-bottom: 1.5rem;
   }
 
   h2 {
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     margin-bottom: 1rem;
   }
 
   h3 {
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--text-light, #FFFFFF);
+    color: var(--text-light, #ffffff);
     margin: 0;
   }
 
   .disclaimer {
     background: rgba(244, 67, 54, 0.1);
-    border: 1px solid #F44336;
+    border: 1px solid #f44336;
     border-radius: 8px;
     padding: 1rem;
     margin: 1.5rem 0;
@@ -156,7 +171,7 @@
   }
 
   .disclaimer :global(svg) {
-    color: #F44336;
+    color: #f44336;
     flex-shrink: 0;
     margin-top: 0.25rem;
   }
@@ -182,27 +197,39 @@
   }
 
   .pending .status-header :global(svg) {
-    color: #FFA500;
+    color: #ffa500;
   }
 
   .in-progress .status-header :global(svg) {
-    color: #64B5F6;
+    color: #64b5f6;
   }
 
   .resolved .status-header :global(svg) {
-    color: #4CAF50;
+    color: #4caf50;
   }
 
   .pending {
-    background: linear-gradient(rgba(255, 165, 0, 0.05), rgba(255, 165, 0, 0.05)), var(--gray-dark, #333333);
+    background: linear-gradient(
+        rgba(255, 165, 0, 0.05),
+        rgba(255, 165, 0, 0.05)
+      ),
+      var(--gray-dark, #333333);
   }
 
   .in-progress {
-    background: linear-gradient(rgba(100, 181, 246, 0.05), rgba(100, 181, 246, 0.05)), var(--gray-dark, #333333);
+    background: linear-gradient(
+        rgba(100, 181, 246, 0.05),
+        rgba(100, 181, 246, 0.05)
+      ),
+      var(--gray-dark, #333333);
   }
 
   .resolved {
-    background: linear-gradient(rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.05)), var(--gray-dark, #333333);
+    background: linear-gradient(
+        rgba(76, 175, 80, 0.05),
+        rgba(76, 175, 80, 0.05)
+      ),
+      var(--gray-dark, #333333);
   }
 
   ol {
@@ -252,7 +279,7 @@
     top: 0;
     width: 1.75rem;
     height: 1.75rem;
-    background: var(--primary, #1976D2);
+    background: var(--primary, #1976d2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -263,7 +290,7 @@
   .process li strong {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--primary, #1976D2);
+    color: var(--primary, #1976d2);
   }
 
   .process li p {
@@ -315,4 +342,4 @@
       font-size: 0.9rem;
     }
   }
-</style> 
+</style>
