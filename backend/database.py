@@ -9,7 +9,7 @@ IS_DOCKER = os.path.exists('/app')
 
 # Use different database paths for Docker vs local development
 if IS_DOCKER:
-    DEFAULT_DB_URL = "sqlite+aiosqlite:////app/test.db"
+    DEFAULT_DB_URL = "sqlite+aiosqlite:////app/data/test.db"
 else:
     # Use a local path in the backend directory
     BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))

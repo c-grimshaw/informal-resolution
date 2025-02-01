@@ -10,6 +10,11 @@ RUN npm run build
 FROM python:3.13-rc-slim
 WORKDIR /app
 
+# Create necessary directories
+RUN mkdir -p /app/data && \
+    mkdir -p /app/static/_app && \
+    chown -R nobody:nogroup /app/data
+
 # Copy backend files first
 COPY backend/pyproject.toml ./
 RUN pip install --no-cache-dir .
