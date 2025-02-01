@@ -16,6 +16,7 @@ htmlcov/
 .env.local
 backend/logs/
 backend/*.log
+backend/data/
 
 # Frontend
 frontend/node_modules/

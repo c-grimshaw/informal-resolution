@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from routes import grievances
+import os
 
 
 @asynccontextmanager
@@ -67,14 +68,15 @@ app.include_router(auth_router, prefix="/auth")
 app.include_router(users_router, prefix="/users")
 app.include_router(grievances.router)
 
-# Mount static files for assets
-app.mount("/_app", StaticFiles(directory="static/_app"), name="static_app")
+# Only mount static files if we're in Docker (check for the static directory)
+if os.path.exists("static/_app"):
+    # Mount static files for assets
+    app.mount("/_app", StaticFiles(directory="static/_app"), name="static_app")
 
-
-# Catch-all route for SPA
-@app.get("/{full_path:path}")
-async def serve_spa(full_path: str):
-    """Serve the SPA's index.html for any path not matched by the API routes or static files."""
-    if full_path.startswith("_app/"):
-        return FileResponse(f"static/{full_path}")
-    return FileResponse("static/index.html")
+    # Catch-all route for SPA
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        """Serve the SPA's index.html for any path not matched by the API routes or static files."""
+        if full_path.startswith("_app/"):
+            return FileResponse(f"static/{full_path}")
+        return FileResponse("static/index.html")
