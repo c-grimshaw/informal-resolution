@@ -12,20 +12,20 @@ export const load = async ({ parent }) => {
     }
 
     if (!auth.user?.id) {
-        store.setGrievances([]);
-        return { grievances: [] };
+        store.setStakeholders([]);
+        return { stakeholders: [] };
     }
 
     try {
         store.setLoading(true);
-        const grievances = await get('/grievances');
-        store.setGrievances(grievances);
-        return { grievances };
+        const stakeholders = await get('/users/all');
+        store.setStakeholders(stakeholders);
+        return { stakeholders };
     } catch (error) {
-        console.error("Failed to load grievances:", error);
-        store.setError("Failed to load grievances");
-        store.setGrievances([]);
-        return { grievances: [], error: "Failed to load grievances" };
+        console.error("Failed to load stakeholders:", error);
+        store.setError("Failed to load stakeholders");
+        store.setStakeholders([]);
+        return { stakeholders: [], error: "Failed to load stakeholders" };
     } finally {
         store.setLoading(false);
     }

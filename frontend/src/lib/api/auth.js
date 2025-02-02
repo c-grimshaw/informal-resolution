@@ -1,39 +1,26 @@
-import { post } from './client';
+import { post, get } from './client';
 import { auth } from '../stores/authStore.svelte';
 
 export async function login(email, password) {
     try {
+        // Create form data
         const formData = new URLSearchParams();
         formData.append('username', email);
         formData.append('password', password);
 
-        const response = await fetch('/auth/jwt/login', {
-            method: 'POST',
+        // Use our post function with the correct headers
+        const data = await post('/auth/jwt/login', formData, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: formData
+            skipJsonStringify: true
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Login failed');
-        }
-
-        const data = await response.json();
         auth.setToken(data.access_token);
         
         // Fetch user data after successful login
-        const userResponse = await fetch('/users/me', {
-            headers: {
-                'Authorization': `Bearer ${data.access_token}`
-            }
-        });
-        
-        if (userResponse.ok) {
-            const userData = await userResponse.json();
-            auth.setUser(userData);
-        }
+        const userData = await get('/users/me');
+        auth.setUser(userData);
 
         return data;
     } catch (error) {
@@ -44,7 +31,7 @@ export async function login(email, password) {
 
 export async function register(email, password) {
     try {
-        const response = await post('/auth/register', {
+        await post('/auth/register', {
             email,
             password,
             is_active: true,

@@ -7,9 +7,9 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=sqlite+aiosqlite:////app/data/test.db
+      - PYTHONPATH=/app/src
     volumes:
-      - ./backend:/app
-      - ./frontend/build:/app/static
+      - ./backend:/app/src
       - ./backend/data:/app/data
     working_dir: /app
     user: root
@@ -18,9 +18,22 @@ services:
              touch /app/data/test.db &&
              chown nobody:nogroup /app/data/test.db &&
              chmod 666 /app/data/test.db &&
-             mkdir -p /app/static/_app &&
-             python scripts/populate_test_data.py &&
-             uvicorn app:app --host 0.0.0.0 --port 8000"
+             PYTHONPATH=/app/src python scripts/populate_test_data.py &&
+             uvicorn src.app:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - ORIGIN=http://localhost:3000
+      - PROTOCOL_HEADER=x-forwarded-proto
+      - HOST_HEADER=x-forwarded-host
+      - PORT=3000
+    depends_on:
+      - backend
 
 volumes:
   frontend_static:

@@ -5,25 +5,15 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		host: '0.0.0.0',
-		port: 5173,
+		port: 3000,
 		strictPort: true,
 		proxy: {
-			'/users': {
-				target: 'http://127.0.0.1:8000',
-				changeOrigin: true
-			},
-			'/auth': {
-				target: 'http://127.0.0.1:8000',
-				changeOrigin: true
-			},
-			'/grievances': {
-				target: 'http://127.0.0.1:8000',
-				changeOrigin: true
-			},
-			'/stakeholders': {
-				target: 'http://127.0.0.1:8000',
-				changeOrigin: true
+			'/api': {
+				target: 'http://backend:8000',
+				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/api/, '')
 			}
 		}
-	}
+	},
+	envPrefix: 'PUBLIC_'
 });

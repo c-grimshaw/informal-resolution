@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,6 +10,8 @@ from sqlalchemy.orm import Session
 from database import Base
 from models.user import User
 from models.grievance import Grievance, Note, GrievanceStatus
+from src.auth.users import get_user_manager, get_user_db
+from src.database import get_async_session
 
 # Database setup
 DATABASE_URL = "sqlite:///test.db"

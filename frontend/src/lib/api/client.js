@@ -1,5 +1,7 @@
 import { auth } from '../stores/authStore.svelte';
 
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+
 async function handleResponse(response) {
     if (!response.ok) {
         let errorMessage;
@@ -20,8 +22,10 @@ async function handleResponse(response) {
 }
 
 async function request(endpoint, options = {}) {
+    const url = `${API_URL}${endpoint}`;
     const headers = new Headers({
-        ...(options.body && { 'Content-Type': 'application/json' })
+        'Content-Type': 'application/json',
+        ...options.headers,
     });
     
     if (auth.token) {
@@ -31,15 +35,47 @@ async function request(endpoint, options = {}) {
     const config = {
         ...options,
         headers,
-        body: options.body ? JSON.stringify(options.body) : undefined
     };
 
-    const response = await fetch(endpoint, config);
+    // Only stringify the body if it's not already a URLSearchParams and skipJsonStringify is not set
+    if (config.body && !(config.body instanceof URLSearchParams) && !options.skipJsonStringify) {
+        config.body = JSON.stringify(config.body);
+    }
+
+    const response = await fetch(url, config);
     return handleResponse(response);
 }
 
-export const get = (endpoint) => request(endpoint);
-export const post = (endpoint, data) => request(endpoint, { method: 'POST', body: data });
-export const put = (endpoint, data) => request(endpoint, { method: 'PUT', body: data });
-export const patch = (endpoint, data) => request(endpoint, { method: 'PATCH', body: data });
-export const del = (endpoint) => request(endpoint, { method: 'DELETE' }); 
+export async function get(endpoint) {
+    return request(endpoint);
+}
+
+export async function post(endpoint, data, options = {}) {
+    return request(endpoint, {
+        method: 'POST',
+        body: data,
+        ...options
+    });
+}
+
+export async function put(endpoint, data, options = {}) {
+    return request(endpoint, {
+        method: 'PUT',
+        body: data,
+        ...options
+    });
+}
+
+export async function patch(endpoint, data, options = {}) {
+    return request(endpoint, {
+        method: 'PATCH',
+        body: data,
+        ...options
+    });
+}
+
+export async function del(endpoint) {
+    return request(endpoint, {
+        method: 'DELETE',
+    });
+} 

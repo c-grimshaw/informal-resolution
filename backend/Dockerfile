@@ -10,19 +10,27 @@ RUN npm run build
 FROM python:3.13-rc-slim
 WORKDIR /app
 
-# Create necessary directories
-RUN mkdir -p /app/data && \
-    mkdir -p /app/static/_app && \
-    chown -R nobody:nogroup /app/data
+# Create src directory and copy Python package files
+RUN mkdir -p /app/src
+WORKDIR /app/src
+COPY backend/pyproject.toml backend/app.py backend/database.py ./
+COPY backend/auth ./auth
+COPY backend/models ./models
+COPY backend/routes ./routes
+COPY backend/schemas ./schemas
 
-# Copy backend files first
-COPY backend/pyproject.toml ./
-RUN pip install --no-cache-dir .
-COPY backend/ .
+# Install dependencies
+WORKDIR /app
+RUN pip install --no-cache-dir -e src/
 
-# Copy frontend build to the correct location
-COPY --from=frontend /frontend/build/index.html /app/static/
-COPY --from=frontend /frontend/build/_app /app/static/_app
+# Create necessary directories and copy scripts
+RUN mkdir -p data && \
+    chown -R nobody:nogroup data && \
+    chmod 777 data
+COPY backend/scripts ./scripts
+
+# Set Python path to include src directory
+ENV PYTHONPATH=/app/src
 
 # Run the application
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"] 

@@ -1,7 +1,8 @@
 import { auth } from "$lib/stores/authStore.svelte";
 import { personalGrievances } from "$lib/stores/personalGrievances.svelte.js";
+import { get } from "$lib/api/client";
 
-export const load = async ({ fetch, parent }) => {
+export const load = async ({ parent }) => {
     // Wait for parent layout load to complete
     await parent();
     
@@ -17,12 +18,7 @@ export const load = async ({ fetch, parent }) => {
 
     try {
         personalGrievances.setLoading(true);
-        const response = await fetch(`/grievances/user/${auth.user.id}`, {
-            headers: {
-                'Authorization': `Bearer ${auth.token}`
-            }
-        });
-        const grievances = await response.json();
+        const grievances = await get(`/grievances/user/${auth.user.id}`);
         personalGrievances.setGrievances(grievances);
         return { grievances };
     } catch (error) {

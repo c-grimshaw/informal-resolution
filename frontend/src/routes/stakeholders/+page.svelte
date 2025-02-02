@@ -1,25 +1,6 @@
 <script>
-  import { onMount } from "svelte";
-  import { get } from "$lib/api/client";
   import { store } from "$lib/stores/store.svelte";
   import StakeholdersTable from "$lib/StakeholdersTable.svelte";
-
-  onMount(async () => {
-    await fetchStakeholders();
-  });
-
-  async function fetchStakeholders() {
-    try {
-      store.setLoading(true);
-      const response = await get("/users/all");
-      console.log(response);
-      store.setStakeholders(response);
-    } catch (error) {
-      store.setError("Failed to fetch stakeholders");
-    } finally {
-      store.setLoading(false);
-    }
-  }
 </script>
 
 <div class="stakeholders-view">

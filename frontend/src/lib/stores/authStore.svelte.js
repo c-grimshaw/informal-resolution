@@ -1,3 +1,6 @@
+import { get } from '../api/client';
+import { browser } from '$app/environment';
+
 function createAuthStore() {
     const state = $state({
         user: null,
@@ -21,10 +24,14 @@ function createAuthStore() {
         setToken(newToken) {
             state.token = newToken;
             if (newToken) {
-                localStorage.setItem('token', newToken);
+                if (browser) {
+                    localStorage.setItem('token', newToken);
+                }
                 state.isAuthenticated = true;
             } else {
-                localStorage.removeItem('token');
+                if (browser) {
+                    localStorage.removeItem('token');
+                }
                 state.isAuthenticated = false;
                 state.user = null;
                 state.isAdmin = false;
@@ -48,20 +55,11 @@ function createAuthStore() {
             state.loading = value;
         },
 
-        async loadUser(customFetch = fetch) {
+        async loadUser() {
             state.loading = true;
             try {
-                const response = await customFetch('/users/me', {
-                    headers: {
-                        'Authorization': `Bearer ${state.token}`
-                    }
-                });
-                if (response.ok) {
-                    const userData = await response.json();
-                    this.setUser(userData);
-                } else {
-                    this.setToken(null);
-                }
+                const userData = await get('/users/me');
+                this.setUser(userData);
             } catch (error) {
                 console.error('Failed to load user:', error);
                 this.setToken(null);
@@ -70,12 +68,14 @@ function createAuthStore() {
             }
         },
 
-        async initialize(customFetch = fetch) {
+        async initialize() {
             state.loading = true;
-            const savedToken = localStorage.getItem('token');
-            if (savedToken) {
-                this.setToken(savedToken);
-                await this.loadUser(customFetch);
+            if (browser) {
+                const savedToken = localStorage.getItem('token');
+                if (savedToken) {
+                    this.setToken(savedToken);
+                    await this.loadUser();
+                }
             }
             state.loading = false;
         },
@@ -86,7 +86,9 @@ function createAuthStore() {
             state.isSupervisor = false;
             state.isAuthenticated = false;
             state.token = null;
-            localStorage.removeItem('token');
+            if (browser) {
+                localStorage.removeItem('token');
+            }
             state.currentRoute = 'login';
         }
     };
